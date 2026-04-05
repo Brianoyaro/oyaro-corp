@@ -3,8 +3,8 @@ package com.oyaro_corp.oyaro.corporation.entity;
 import jakarta.persistence.*;
 //import lombok.AllArgsConstructor;
 //import lombok.NoArgsConstructor;
-import org.jspecify.annotations.Nullable;
-import org.springframework.data.annotation.Id;
+//import org.jspecify.annotations.Nullable;
+//import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -77,7 +77,7 @@ public class User implements UserDetails {
     }
 
     @Override
-    public @Nullable String getPassword() {
+    public String getPassword() {
         return this.password;
     }
 
