@@ -16,6 +16,8 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
   },
+
+  // Authentication Routes
   // Login Route
   {
     path: "/login",
@@ -27,6 +29,8 @@ const router = createBrowserRouter([
     element: <Register />,
   },
 
+
+  // Error Routes
   // 404 Not Found Route
   {
     path: "*",
