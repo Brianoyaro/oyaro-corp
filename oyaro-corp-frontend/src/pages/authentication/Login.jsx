@@ -1,9 +1,17 @@
 import { useEffect, useState } from "react"
 import authService from "../../service/AuthService"
+import { useQuery } from '@tanstack/react-query'
+
 
 function Login() {
   
-  const [responseData, setResponseData] = useState(null);
+  // use tanStack query to fetch login data and manage loading and error states
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['loginData'],
+    queryFn: () => authService.login({ email: 'test1@email.com', password: 'password' })
+  });
+
+  /*const [responseData, setResponseData] = useState(null);
 
   useEffect(() => {
   const fetchData = async () => {
@@ -15,15 +23,15 @@ function Login() {
     }
   };
   fetchData();
-}, []); // Empty array runs effect only on mount
+}, []); // Empty array runs effect only on mount*/
 
   return (
     <div>
       <h1>Login Page</h1>
-      {responseData && (
+      {data && (
         <div>
           <h2>Login Response:</h2>
-          <pre>{JSON.stringify(responseData, null, 2)}</pre>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
         </div>
       )}
     </div>
