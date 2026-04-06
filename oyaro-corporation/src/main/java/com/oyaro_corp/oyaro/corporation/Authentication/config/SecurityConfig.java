@@ -1,6 +1,6 @@
-package com.oyaro_corp.oyaro.corporation.config;
+package com.oyaro_corp.oyaro.corporation.Authentication.config;
 
-import com.oyaro_corp.oyaro.corporation.service.CustomUserDetailsService;
+import com.oyaro_corp.oyaro.corporation.Authentication.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -1,11 +1,11 @@
-package com.oyaro_corp.oyaro.corporation.controller;
+package com.oyaro_corp.oyaro.corporation.Authentication.controller;
 
-import com.oyaro_corp.oyaro.corporation.dto.AuthRequest;
-import com.oyaro_corp.oyaro.corporation.dto.AuthResponse;
-import com.oyaro_corp.oyaro.corporation.dto.RefreshTokenRequest;
-import com.oyaro_corp.oyaro.corporation.dto.RegisterRequest;
+import com.oyaro_corp.oyaro.corporation.Authentication.dto.AuthRequest;
+import com.oyaro_corp.oyaro.corporation.Authentication.dto.AuthResponse;
+import com.oyaro_corp.oyaro.corporation.Authentication.dto.RefreshTokenRequest;
+import com.oyaro_corp.oyaro.corporation.Authentication.dto.RegisterRequest;
 
-import com.oyaro_corp.oyaro.corporation.service.AuthService;
+import com.oyaro_corp.oyaro.corporation.Authentication.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

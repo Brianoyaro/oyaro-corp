@@ -1,6 +1,6 @@
-package com.oyaro_corp.oyaro.corporation.dto;
+package com.oyaro_corp.oyaro.corporation.Authentication.dto;
 
-import com.oyaro_corp.oyaro.corporation.entity.Role;
+import com.oyaro_corp.oyaro.corporation.Authentication.entity.Role;
 
 public class RegisterRequest {
     private String email;

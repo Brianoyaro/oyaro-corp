@@ -1,4 +1,4 @@
-package com.oyaro_corp.oyaro.corporation.dto;
+package com.oyaro_corp.oyaro.corporation.Authentication.dto;
 
 // Will be used when we log in a user in the service layer
 public class AuthResponse {

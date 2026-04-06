@@ -1,4 +1,4 @@
-package com.oyaro_corp.oyaro.corporation.entity;
+package com.oyaro_corp.oyaro.corporation.Authentication.entity;
 
 import jakarta.persistence.*;
 //import lombok.AllArgsConstructor;

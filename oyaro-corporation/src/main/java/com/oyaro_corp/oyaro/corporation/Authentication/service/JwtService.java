@@ -1,4 +1,4 @@
-package com.oyaro_corp.oyaro.corporation.service;
+package com.oyaro_corp.oyaro.corporation.Authentication.service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

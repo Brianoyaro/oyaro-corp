@@ -1,6 +1,6 @@
-package com.oyaro_corp.oyaro.corporation.service;
+package com.oyaro_corp.oyaro.corporation.Authentication.service;
 
-import com.oyaro_corp.oyaro.corporation.repository.UserRepository;
+import com.oyaro_corp.oyaro.corporation.Authentication.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

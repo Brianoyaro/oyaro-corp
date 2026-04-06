@@ -1,4 +1,4 @@
-package com.oyaro_corp.oyaro.corporation.dto;
+package com.oyaro_corp.oyaro.corporation.Authentication.dto;
 
 public class RefreshTokenRequest {
     private String token;

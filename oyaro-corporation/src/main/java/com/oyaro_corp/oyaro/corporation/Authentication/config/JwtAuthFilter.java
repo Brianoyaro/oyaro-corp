@@ -1,7 +1,7 @@
-package com.oyaro_corp.oyaro.corporation.config;
+package com.oyaro_corp.oyaro.corporation.Authentication.config;
 
-import com.oyaro_corp.oyaro.corporation.service.CustomUserDetailsService;
-import com.oyaro_corp.oyaro.corporation.service.JwtService;
+import com.oyaro_corp.oyaro.corporation.Authentication.service.CustomUserDetailsService;
+import com.oyaro_corp.oyaro.corporation.Authentication.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

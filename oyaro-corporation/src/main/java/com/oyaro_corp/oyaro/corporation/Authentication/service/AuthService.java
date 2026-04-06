@@ -1,18 +1,18 @@
-package com.oyaro_corp.oyaro.corporation.service;
+package com.oyaro_corp.oyaro.corporation.Authentication.service;
 
-import com.oyaro_corp.oyaro.corporation.dto.AuthRequest;
-import com.oyaro_corp.oyaro.corporation.dto.AuthResponse;
-import com.oyaro_corp.oyaro.corporation.dto.RefreshTokenRequest;
-import com.oyaro_corp.oyaro.corporation.dto.RegisterRequest;
-import com.oyaro_corp.oyaro.corporation.entity.Role;
-import com.oyaro_corp.oyaro.corporation.repository.UserRepository;
+import com.oyaro_corp.oyaro.corporation.Authentication.dto.AuthRequest;
+import com.oyaro_corp.oyaro.corporation.Authentication.dto.AuthResponse;
+import com.oyaro_corp.oyaro.corporation.Authentication.dto.RefreshTokenRequest;
+import com.oyaro_corp.oyaro.corporation.Authentication.dto.RegisterRequest;
+import com.oyaro_corp.oyaro.corporation.Authentication.entity.Role;
+import com.oyaro_corp.oyaro.corporation.Authentication.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 //import org.springframework.security.core.userdetails.User;
-import com.oyaro_corp.oyaro.corporation.entity.User;
+import com.oyaro_corp.oyaro.corporation.Authentication.entity.User;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;

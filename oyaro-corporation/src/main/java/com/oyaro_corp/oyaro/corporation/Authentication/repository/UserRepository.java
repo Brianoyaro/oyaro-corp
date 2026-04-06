@@ -1,9 +1,9 @@
-package com.oyaro_corp.oyaro.corporation.repository;
+package com.oyaro_corp.oyaro.corporation.Authentication.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 //import org.springframework.security.core.userdetails.User;
-import com.oyaro_corp.oyaro.corporation.entity.User;
+import com.oyaro_corp.oyaro.corporation.Authentication.entity.User;
 
 import org.springframework.stereotype.Repository;
 
