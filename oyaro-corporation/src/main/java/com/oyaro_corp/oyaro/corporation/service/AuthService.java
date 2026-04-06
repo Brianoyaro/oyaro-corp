@@ -103,7 +103,7 @@ public class AuthService {
         try{
             // extract username from refreshToken
             userEmail = jwtService.extractUsername(refreshToken);
-            if (userEmail == null){
+            if (userEmail != null){
                 // load user details from the database
                 User user = userRepository.findByEmail(userEmail)
                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));

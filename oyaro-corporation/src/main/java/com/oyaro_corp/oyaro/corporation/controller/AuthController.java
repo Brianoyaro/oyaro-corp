@@ -27,10 +27,12 @@ public class AuthController {
         try {
             AuthResponse authResponse = authService.register(registerRequest, httpServletRequest);
             return ResponseEntity.ok(authResponse);
+            // email already exists error captured here.
         } catch (IllegalStateException e) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(new ErrorResponse(e.getMessage()));
+            // general errors captured here.
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)

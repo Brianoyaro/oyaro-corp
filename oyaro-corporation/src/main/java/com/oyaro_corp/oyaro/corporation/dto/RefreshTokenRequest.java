@@ -8,9 +8,16 @@ public class RefreshTokenRequest {
     }
 
     public String getToken() {
-        return token;
+        return this.token;
     }
     public void setToken(String token) {
         this.token = token;
+    }
+
+    @Override
+    public String toString() {
+        return "RefreshTokenRequest{" +
+                "token='" + this.token + '\'' +
+                '}';
     }
 }

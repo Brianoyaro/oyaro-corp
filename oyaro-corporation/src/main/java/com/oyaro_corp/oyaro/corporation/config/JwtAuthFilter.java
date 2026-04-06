@@ -49,13 +49,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         final String token = authHeader.substring(7);
+        // Validate token format before parsing
+        if (token.isEmpty() || !token.contains(".")) {
+            logger.warn("Invalid token format - not a valid JWT");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String userEmail;
         // work on jwtService then continue with the jwtFilter logic
         try {
             // extract username from jwt
             userEmail = jwtService.extractUsername(token);
 
-            if (userEmail == null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(userEmail);
 
                 if (jwtService.isTokenValid(token, userDetails)) {
