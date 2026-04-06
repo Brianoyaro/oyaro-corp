@@ -30,6 +30,13 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+     // Don't attempt token refresh for auth endpoints
+    if (originalRequest.url.includes('/auth/') && originalRequest.url !== '/auth/refresh-token') {
+      return Promise.reject(error);
+    }
+
+    
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true; // prevent infinite loop
       try {
