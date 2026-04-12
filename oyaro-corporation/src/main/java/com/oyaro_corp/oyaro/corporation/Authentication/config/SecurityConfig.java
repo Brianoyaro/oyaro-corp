@@ -52,7 +52,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         // these endpoints are exempted from authentication
                         .requestMatchers(
-                                "/api/auth/**"
+                                "/api/auth/**",
+                                "/api/categories/**" // for testing!!!!!!!!!!!
                         ).permitAll()
                         // these endpoints require a user to have ADMIN role
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

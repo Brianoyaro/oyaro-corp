@@ -64,7 +64,7 @@ public class CategoryService {
 
     // get all descendant
     public List<CategoryResponse> getDescendants(Long id) {
-        Category category = categoryRespository.findById(id).orElseThrow(() => new RuntimeException("Category NOT found"));
+        Category category = categoryRespository.findById(id).orElseThrow(() -> new RuntimeException("Category NOT found"));
         return categoryRespository.findDescendants(category.getPath())
                 .stream()
                 .map(this::mapToResponse)
@@ -109,8 +109,8 @@ public class CategoryService {
 
     // ✅ MOVE CATEGORY (ADVANCED)
     public void moveCategory(Long categoryId, Long newParentId) {
-        Category category = categoryRespository.findById(categoryId).orElseThrow();
-        Category newParent = categoryRespository.findById(newParentId).orElseThrow();
+        Category category = categoryRespository.findById(categoryId).orElseThrow(() -> new RuntimeException("category NOT found."));
+        Category newParent = categoryRespository.findById(newParentId).orElseThrow(() -> new RuntimeException("parent NOT found."));
 
         String oldPath = category.getPath();
         String newPath = newParent.getPath() + category.getId() + "/";

@@ -1,7 +1,11 @@
 package com.oyaro_corp.oyaro.corporation.category.dto;
 
+import jakarta.annotation.Nullable;
+
 public class CreateCategoryRequest {
     public String name;
+
+    @Nullable
     public Long parentId; // nullable
 
     public CreateCategoryRequest() {}

@@ -21,7 +21,7 @@ public class Category {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, length = 255)
+//    @Column(nullable = false, length = 255)
     private String path;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,19 +41,6 @@ public class Category {
     public Category(String name) {
         this.name = name;
     }
-
-    /*
-    // version 2
-    // -------------
-    @PrePersist
-    private void generate Path() {
-        if (parent != null) {
-            this.path = parent.getPath() + this.id
-        } else {
-            this.path = '/' + this.id + '/'
-        }
-    }
-     */
 
 
     // getters and setters
