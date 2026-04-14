@@ -5,6 +5,7 @@ import com.oyaro_corp.oyaro.corporation.product.dto.CreateProductRequest;
 import com.oyaro_corp.oyaro.corporation.product.dto.ProductResponse;
 import com.oyaro_corp.oyaro.corporation.product.entity.Product;
 import com.oyaro_corp.oyaro.corporation.product.entity.ProductImage;
+import com.oyaro_corp.oyaro.corporation.product.repository.ProductImageRepository;
 import com.oyaro_corp.oyaro.corporation.product.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,13 +23,16 @@ public class ProductService {
     private final ProductRepository productRepo;
     private final CategoryRepository categoryRepo;
     private final FileStorageService fileService;
+    private final ProductImageRepository imageRepo;
 
     public ProductService(ProductRepository productRepo,
                           CategoryRepository categoryRepo,
-                          FileStorageService fileService) {
+                          FileStorageService fileService,
+                          ProductImageRepository imageRepo) {
         this.productRepo = productRepo;
         this.categoryRepo = categoryRepo;
         this.fileService = fileService;
+        this.imageRepo = imageRepo;
     }
 
     // ✅ CREATE PRODUCT WITH IMAGES
@@ -80,6 +84,15 @@ public class ProductService {
 
     // ✅ DELETE PRODUCT
     public void deleteProduct(Long id) {
+        // productRepo.deleteById(id);
+        Product product = productRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Product not found"));
+        
+        // Delete all image files from disk
+        product.getImages().forEach(img -> 
+            fileService.deleteFile(img.getImageUrl())
+        );
+        
         productRepo.deleteById(id);
     }
 
@@ -103,9 +116,13 @@ public class ProductService {
 
     // ✅ DELETE IMAGE
     public void deleteImage(Long imageId) {
-        productRepo.findAll().forEach(p ->
-                p.getImages().removeIf(img -> img.getId().equals(imageId))
-        );
+        // productRepo.findAll().forEach(p ->
+        //         p.getImages().removeIf(img -> img.getId().equals(imageId))
+        // );
+        ProductImage image = imageRepo.findById(imageId)
+            .orElseThrow(() -> new RuntimeException("Image not found"));
+        fileService.deleteFile(image.getImageUrl()); // Delete from disk
+        imageRepo.delete(image); // Delete from DB
     }
 
     // 🔁 MAPPER
@@ -127,5 +144,12 @@ public class ProductService {
         }).toList());
 
         return res;
+    }
+
+    public List<ProductResponse> getAllProducts() {
+        //
+        return productRepo.findAll().stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 }

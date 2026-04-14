@@ -22,6 +22,11 @@ public class ProductController {
         this.objectMapper = objectMapper;
     }
 
+    @GetMapping
+    public List<ProductResponse> getAllProducts() {
+        return service.getAllProducts();
+    }
+
     // ✅ CREATE PRODUCT WITH IMAGES
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ProductResponse createProduct(

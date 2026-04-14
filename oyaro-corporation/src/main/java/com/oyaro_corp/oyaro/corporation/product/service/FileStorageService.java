@@ -15,6 +15,12 @@ public class FileStorageService {
     private final String uploadDir = "uploads/";
 
     public String saveFile(MultipartFile file) {
+         // Validate file type
+        String contentType = file.getContentType();
+        if (!contentType.startsWith("image/")) {
+            throw new RuntimeException("Only image files are allowed");
+        }
+        
         try {
             String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
@@ -26,6 +32,17 @@ public class FileStorageService {
             return "/uploads/" + filename; // URL path
         } catch (IOException e) {
             throw new RuntimeException("File upload failed");
+        }
+    }
+
+    public void deleteFile(String fileUrl) {
+        try {
+            // Extract filename from URL path: "/uploads/uuid_filename.jpg"
+            String filename = fileUrl.substring("/uploads/".length());
+            Path path = Paths.get(uploadDir + filename);
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            throw new RuntimeException("File deletion failed: " + e.getMessage());
         }
     }
 }
