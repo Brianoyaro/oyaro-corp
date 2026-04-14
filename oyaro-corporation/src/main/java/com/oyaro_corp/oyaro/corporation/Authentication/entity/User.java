@@ -1,5 +1,6 @@
 package com.oyaro_corp.oyaro.corporation.Authentication.entity;
 
+import com.oyaro_corp.oyaro.corporation.cart.entity.Cart;
 import jakarta.persistence.*;
 //import lombok.AllArgsConstructor;
 //import lombok.NoArgsConstructor;
@@ -26,6 +27,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Cart cart;
 
     // UserDetails implementation fields
     @Column(nullable = false)

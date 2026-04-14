@@ -6,6 +6,7 @@ import com.oyaro_corp.oyaro.corporation.Authentication.dto.RefreshTokenRequest;
 import com.oyaro_corp.oyaro.corporation.Authentication.dto.RegisterRequest;
 import com.oyaro_corp.oyaro.corporation.Authentication.entity.Role;
 import com.oyaro_corp.oyaro.corporation.Authentication.repository.UserRepository;
+import com.oyaro_corp.oyaro.corporation.cart.service.CartService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,11 +29,14 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, JwtService jwtService, PasswordEncoder passwordEncoder) {
+    private CartService cartService;
+
+    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, JwtService jwtService, PasswordEncoder passwordEncoder, CartService cartService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
+        this.cartService = cartService;
     }
 
     // register
@@ -54,6 +58,12 @@ public class AuthService {
         user.setLastLoginIp(getClientIp(httpServletRequest));
 
         userRepository.save(user);
+
+        // create cart for each user when they're created
+        if (user.getRole() != Role.ADMIN) {
+            //
+            cartService.createCartForUser(user);
+        }
 
         // generate access and refresh access tokens
         String accessToken = jwtService.generateAccessToken(user);

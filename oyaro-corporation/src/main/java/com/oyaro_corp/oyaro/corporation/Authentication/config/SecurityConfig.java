@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/uploads/**",
-                                "/api/categories/**", "/api/products/**" // for testing!!!!!!!!!!!
+                                "/api/categories/**", "/api/products/**", "/api/cart/**" // for testing!!!!!!!!!!!
                         ).permitAll()
                         // these endpoints require a user to have ADMIN role
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
