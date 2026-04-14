@@ -4,7 +4,7 @@ import com.oyaro_corp.oyaro.corporation.category.dto.CategoryResponse;
 import com.oyaro_corp.oyaro.corporation.category.dto.CategoryTreeNode;
 import com.oyaro_corp.oyaro.corporation.category.dto.CreateCategoryRequest;
 import com.oyaro_corp.oyaro.corporation.category.entity.Category;
-import com.oyaro_corp.oyaro.corporation.category.repository.CategoryRespository;
+import com.oyaro_corp.oyaro.corporation.category.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +17,9 @@ import java.util.Map;
 @Transactional
 public class CategoryService {
 
-    private final CategoryRespository categoryRespository;
+    private final CategoryRepository categoryRespository;
 
-    public CategoryService(CategoryRespository categoryRespository) {
+    public CategoryService(CategoryRepository categoryRespository) {
         this.categoryRespository = categoryRespository;
     }
 
