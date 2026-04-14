@@ -11,9 +11,11 @@ import com.oyaro_corp.oyaro.corporation.cart.repository.CartItemRepository;
 import com.oyaro_corp.oyaro.corporation.cart.repository.CartRepository;
 import com.oyaro_corp.oyaro.corporation.product.entity.Product;
 import com.oyaro_corp.oyaro.corporation.product.repository.ProductRepository;
+import com.oyaro_corp.oyaro.corporation.wrapper.IDORprevention;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.AccessDeniedException;
 import java.util.Optional;
 
 @Service
@@ -21,7 +23,7 @@ import java.util.Optional;
 public class CartService {
 
     private final CartRepository cartRepo;
-    private final CartItemRepository itemRepo;
+    private final CartItemRepository cartItemRepo;
     private final ProductRepository productRepo;
     private final UserRepository userRepo;
 
@@ -30,20 +32,23 @@ public class CartService {
                        ProductRepository productRepo,
                        UserRepository userRepo) {
         this.cartRepo = cartRepo;
-        this.itemRepo = itemRepo;
+        this.cartItemRepo = itemRepo;
         this.productRepo = productRepo;
         this.userRepo = userRepo;
     }
 
     // ✅ CREATE CART WHEN USER IS CREATED
-    public Cart createCartForUser(User user) {
+    public void createCartForUser(User user) {
         Cart cart = new Cart();
         cart.setUser(user);
-        return cartRepo.save(cart);
+        cartRepo.save(cart);
     }
 
     // ✅ GET CART
-    public CartResponse getCart(Long userId) {
+    public CartResponse getCart(Long userId) throws AccessDeniedException {
+        // perform an IDOR prevention using the userID
+        IDORprevention.isThisMyId(userId);
+
         Cart cart = cartRepo.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
@@ -51,7 +56,10 @@ public class CartService {
     }
 
     // ✅ ADD TO CART
-    public CartResponse addToCart(Long userId, AddToCartRequest req) {
+    public CartResponse addToCart(Long userId, AddToCartRequest req) throws AccessDeniedException {
+
+        // perform an IDOR prevention using the userID
+        IDORprevention.isThisMyId(userId);
 
         Cart cart = cartRepo.findByUserId(userId)
                 .orElseThrow();
@@ -60,7 +68,7 @@ public class CartService {
                 .orElseThrow();
 
         Optional<CartItem> existing =
-                itemRepo.findByCartIdAndProductId(cart.getId(), product.getId());
+                cartItemRepo.findByCartIdAndProductId(cart.getId(), product.getId());
 
         if (existing.isPresent()) {
             CartItem item = existing.get();
@@ -79,8 +87,12 @@ public class CartService {
     }
 
     // ✅ UPDATE ITEM
-    public CartResponse updateItem(Long itemId, Integer quantity) {
-        CartItem item = itemRepo.findById(itemId).orElseThrow();
+    public CartResponse updateItem(Long itemId, Integer quantity) throws AccessDeniedException {
+        CartItem item = cartItemRepo.findById(itemId).orElseThrow();
+
+        // perform an IDOR preventition
+        Cart cart = item.getCart();
+        IDORprevention.isThisMyCart(cart);
 
         item.setQuantity(quantity);
 
@@ -88,17 +100,24 @@ public class CartService {
     }
 
     // ✅ REMOVE ITEM
-    public CartResponse removeItem(Long itemId) {
-        CartItem item = itemRepo.findById(itemId).orElseThrow();
+    public CartResponse removeItem(Long itemId) throws AccessDeniedException {
+        CartItem item = cartItemRepo.findById(itemId).orElseThrow();
 
         Cart cart = item.getCart();
+
+        // perform an IDOR prevention
+        IDORprevention.isThisMyCart(cart);
+
         cart.getItems().remove(item);
 
         return mapToResponse(cart);
     }
 
     // ✅ CLEAR CART
-    public void clearCart(Long userId) {
+    public void clearCart(Long userId) throws AccessDeniedException {
+        // perform an IDOR prevention using the userID
+        IDORprevention.isThisMyId(userId);
+
         Cart cart = cartRepo.findByUserId(userId).orElseThrow();
         cart.getItems().clear();
     }
