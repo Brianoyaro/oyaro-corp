@@ -2,6 +2,7 @@ package com.oyaro_corp.oyaro.corporation.wrapper;
 
 import com.oyaro_corp.oyaro.corporation.Authentication.entity.User;
 import com.oyaro_corp.oyaro.corporation.cart.entity.Cart;
+import com.oyaro_corp.oyaro.corporation.order.entity.Order;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -22,11 +23,20 @@ public class IDORprevention {
     }
 
     public static void isThisMyCart(Cart cart) throws AccessDeniedException {
-        // ✅ Verify the cart belongs to the authenticated user
+        // Verify the cart belongs to the authenticated user
         User user = (User) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
         assert user != null;
         if (!cart.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("Unauthorized");
+            throw new AccessDeniedException("Unauthorized cart access");
+        }
+    }
+
+    public static void isThisMyOrder(Order order) {
+        // Verify Order ownership
+        User user = (User) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
+        assert user != null;
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized order access");
         }
     }
 }
