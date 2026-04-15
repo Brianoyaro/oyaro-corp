@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 // main app component
 import App from './App.jsx'
 import Dashboard from './pages/Dashboard.jsx'
+import AdminDashboard from './pages/AdminDashboard.jsx'
 
 // authentication pages
 import Login from './pages/authentication/Login.jsx'
@@ -10,6 +11,9 @@ import Register from './pages/authentication/Register.jsx'
 
 // error pages
 import NotFound from './pages/errors/NotFound.jsx'
+
+// protected route
+import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 const router = createBrowserRouter([
   // Home Route - Dashboard
@@ -28,6 +32,16 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
+  },
+
+  // Admin Routes
+  {
+    path: "/admin",
+    element: (
+      <ProtectedRoute requiredRole="ADMIN">
+        <AdminDashboard />
+      </ProtectedRoute>
+    ),
   },
 
 
