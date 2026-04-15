@@ -4,6 +4,10 @@ import { createBrowserRouter } from "react-router-dom";
 import App from './App.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
+import ProductDetail from './pages/ProductDetail.jsx'
+import Cart from './pages/Cart.jsx'
+import Order from './pages/Order.jsx'
+import OrderConfirmation from './pages/OrderConfirmation.jsx'
 
 // authentication pages
 import Login from './pages/authentication/Login.jsx'
@@ -20,6 +24,34 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Dashboard />,
+  },
+
+  // Product Detail Route
+  {
+    path: "/product/:productId",
+    element: <ProductDetail />,
+  },
+
+  // Cart Route
+  {
+    path: "/cart",
+    element: <Cart />,
+  },
+
+  // Order/Checkout Route
+  {
+    path: "/order",
+    element: (
+      <ProtectedRoute>
+        <Order />
+      </ProtectedRoute>
+    ),
+  },
+
+  // Order Confirmation Route
+  {
+    path: "/order-confirmation/:orderId",
+    element: <OrderConfirmation />,
   },
 
   // Authentication Routes

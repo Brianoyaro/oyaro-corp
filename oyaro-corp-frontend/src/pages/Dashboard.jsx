@@ -3,9 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { FiMenu, FiX, FiShoppingCart, FiStar, FiLogOut } from 'react-icons/fi';
 import productService from '../service/productService';
+import { useCart } from '../context/CartContext';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { getTotalItems } = useCart();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -71,11 +73,16 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-6">
-            <button className="relative p-2 hover:bg-gray-100 rounded-lg">
+            <button
+              onClick={() => navigate('/cart')}
+              className="relative p-2 hover:bg-gray-100 rounded-lg"
+            >
               <FiShoppingCart size={24} />
-              <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                0
-              </span>
+              {getTotalItems() > 0 && (
+                <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {getTotalItems()}
+                </span>
+              )}
             </button>
 
             <button
@@ -178,6 +185,7 @@ export default function Dashboard() {
                   return (
                     <div
                       key={product.id}
+                      onClick={() => navigate(`/product/${product.id}`)}
                       className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden group cursor-pointer"
                     >
                       {/* Product Image */}
@@ -222,7 +230,13 @@ export default function Dashboard() {
                           <span className="text-lg font-bold text-gray-900">
                             KES {product.price?.toLocaleString()}
                           </span>
-                          <button className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Will be handled by parent component
+                            }}
+                            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors"
+                          >
                             <FiShoppingCart size={20} />
                           </button>
                         </div>
@@ -232,6 +246,11 @@ export default function Dashboard() {
                 })}
               </div>
             ) : (
+              <div className="text-center py-12">
+                <FiShoppingCart size={48} className="mx-auto text-gray-300 mb-4" />
+                <p className="text-gray-500 text-lg">No products found</p>
+              </div>
+            )}
               <div className="text-center py-12">
                 <FiShoppingCart size={48} className="mx-auto text-gray-300 mb-4" />
                 <p className="text-gray-500 text-lg">No products found</p>
