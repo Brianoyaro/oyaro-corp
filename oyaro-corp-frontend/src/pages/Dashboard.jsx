@@ -255,7 +255,7 @@ export default function Dashboard() {
                 <FiShoppingCart size={48} className="mx-auto text-gray-300 mb-4" />
                 <p className="text-gray-500 text-lg">No products found</p>
               </div>
-            )}
+            {/* )} */}
           </div>
         </main>
       </div>

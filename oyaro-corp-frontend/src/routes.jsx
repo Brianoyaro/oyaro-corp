@@ -20,6 +20,10 @@ import NotFound from './pages/errors/NotFound.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 const router = createBrowserRouter([
+  {
+    path: "/test",
+    element: <AdminDashboard />,
+  },
   // Home Route - Dashboard
   {
     path: "/",

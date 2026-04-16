@@ -12,7 +12,7 @@ import {
   FiUser,
   FiMail,
   FiCheck,
-  Filock,
+  FiLock,
 } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import api from '../service/apiService';
@@ -298,7 +298,7 @@ export default function Order() {
               {/* Payment Method */}
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <Filock size={20} /> Payment Method
+                  <FiLock size={20} /> Payment Method
                 </h2>
 
                 <div className="space-y-4">
