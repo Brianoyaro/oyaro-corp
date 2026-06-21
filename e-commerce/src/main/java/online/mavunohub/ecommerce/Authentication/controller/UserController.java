@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,24 +25,18 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final UserRepo userRepo;
 
-    @GetMapping("/profile")
-    public ResponseEntity<Map<String, Object>> profile() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+@GetMapping("/profile")
+public ResponseEntity<Map<String, Object>> profile( @AuthenticationPrincipal User user) {
+    log.debug("user details : {}, email: {}", user, user.getEmail());
+    Map<String, Object> profileData = new HashMap<>();
+    profileData.put("id", user.getId());
+    profileData.put("email", user.getEmail());
+    profileData.put("role", user.getRole());
+    profileData.put("last_login", user.getLastLogin());
+    profileData.put("created_at", user.getCreatedAt());
 
-        if (authentication != null && authentication.getPrincipal() instanceof User) {
-            User user = (User) authentication.getPrincipal();
-
-            Map<String, Object> profileData = new HashMap<>();
-            profileData.put("id", user.getId());
-            profileData.put("email", user.getEmail());
-            profileData.put("role", user.getRole());
-            profileData.put("last_login", user.getLastLogin());
-            profileData.put("created_at", user.getCreatedAt());
-
-            return ResponseEntity.ok(profileData);
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
+    return ResponseEntity.ok(profileData);
+}
 
     /**
      * Change password for authenticated user

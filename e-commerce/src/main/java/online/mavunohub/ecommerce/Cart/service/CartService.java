@@ -29,25 +29,6 @@ public class CartService {
     private final CartRepo cartRepo;
     private final CartItemRepo cartItemRepo;
     private final ProductRepo productRepo;
-    /**
-     * Create a new cart for a user (called during registration)
-     */
-    public Cart createCartForUser(User user) {
-        log.info("Creating cart for user {}", user.getId());
-
-        if (cartRepo.existsByUserId(user.getId())) {
-            log.warn("Cart already exists for user {}", user.getId());
-            return cartRepo.findByUserId(user.getId()).orElse(null);
-        }
-
-        Cart cart = Cart.builder()
-                .user(user)
-                .build();
-
-        Cart savedCart = cartRepo.save(cart);
-        log.info("Cart created for user {} with id {}", user.getId(), savedCart.getId());
-        return savedCart;
-    }
 
     public CartItemResponseDto addItemToCart(User user, AddToCartRequestDto request) {
         log.info("Adding product {} to cart for user {}", request.getProductId(), user.getId());

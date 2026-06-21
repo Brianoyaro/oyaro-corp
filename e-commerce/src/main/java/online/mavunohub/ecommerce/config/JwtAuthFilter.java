@@ -31,13 +31,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
-        // Skip JWT authentication for endpoints that are public
-        final String requestPath = request.getServletPath();
-        if (requestPath.startsWith("/api/auth/")) {
-            log.debug("Skipping JWT auth for public endpoint: {}", requestPath);
-            filterChain.doFilter(request, response);
-            return;
-        }
+        log.debug("Attempting to authenticate user");
 
         // Extract the token
         final String authHeader = request.getHeader("Authorization");
@@ -50,7 +44,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String token = authHeader.substring(7);
         // Validate token format before parsing
         if (!token.contains(".")) {
-            logger.warn("Invalid token format - not a valid JWT");
+            log.warn("Invalid token format - not a valid JWT");
             filterChain.doFilter(request, response);
             return;
         }
@@ -90,6 +84,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                         // set authentication in the security context
                         SecurityContextHolder.getContext().setAuthentication(authentication);
+                        log.warn("Security ContextHolder: {} has been set", SecurityContextHolder.getContext().getAuthentication());
                         log.info("✅ Authentication set for user: " + userEmail);
                     } else {
                         log.warn("❌ Token validation failed - Audience: " + audienceValid + ", Issuer: " + issuerValid);

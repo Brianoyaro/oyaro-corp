@@ -10,9 +10,10 @@ import online.mavunohub.ecommerce.Authentication.Dto.RegisterRequestDto;
 import online.mavunohub.ecommerce.Authentication.model.Role;
 import online.mavunohub.ecommerce.Authentication.model.User;
 import online.mavunohub.ecommerce.Authentication.repository.UserRepo;
+import online.mavunohub.ecommerce.Cart.model.Cart;
 import online.mavunohub.ecommerce.Cart.service.CartService;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,21 +39,21 @@ public class AuthService {
             throw new IllegalStateException("Email already exists");
         }
 
+        log.info("Register request: {}", registerRequest);
+        String encodedPassword = passwordEncoder.encode(registerRequest.getPassword());
+        log.info("Encoded password: {}", encodedPassword);
         User user = User.builder()
                 .email(registerRequest.getEmail())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .password(encodedPassword)
                 .lastLogin(LocalDateTime.now())
                 .build();
 
+        Cart cart = new Cart();
+
+        cart.setUser(user);
+        user.setCart(cart);
 
         user = userRepo.save(user);
-
-        // create cart for each user when they're created
-        if (user.getRole() != Role.ADMIN) {
-            cartService.createCartForUser(user);
-//            user.setCart(cart);
-        }
-
         return mapper(user);
     }
 
@@ -69,20 +70,32 @@ public class AuthService {
     }
 
     public AuthResponseDto authenticate(@RequestBody AuthRequestDto authRequest) {
-        // authenticate the user
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
-        );
+        try {
+            // authenticate the user
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
+            );
 
-        // load the user
-        User user = userRepo.findByEmail(authRequest.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            // load the user
+            User user = userRepo.findByEmail(authRequest.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
 
-        // add metadata
-        user.setLastLogin(LocalDateTime.now());
+            // add metadata
+            user.setLastLogin(LocalDateTime.now());
 
-        userRepo.save(user);
+            userRepo.save(user);
 
-        return mapper(user);
+            return mapper(user);
+        }  catch (BadCredentialsException e) {
+            throw new RuntimeException("Invalid email or password");
+        } catch (LockedException e) {
+            throw new RuntimeException("Account is locked");
+        } catch (DisabledException e) {
+            throw new RuntimeException("Account is disabled");
+        } catch (AccountExpiredException e) {
+            throw new RuntimeException("Account has expired");
+        } catch (CredentialsExpiredException e) {
+            throw new RuntimeException("Credentials have expired");
+        }
     }
 
     // refresh access token

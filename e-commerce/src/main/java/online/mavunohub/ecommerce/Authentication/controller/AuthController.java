@@ -53,7 +53,7 @@ public class AuthController {
         try {
             AuthResponseDto authResponse = authService.authenticate(authRequest);
             return ResponseEntity.ok(authResponse);
-        } catch (UsernameNotFoundException e) {
+        } catch (RuntimeException e) {
             log.error("Username not found exception during Login: {}.", e.getMessage());
             Map<String, Object> response = new HashMap<>();
             response.put("message", e.getMessage());

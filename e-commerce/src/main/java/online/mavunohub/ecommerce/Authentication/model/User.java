@@ -34,8 +34,10 @@ public class User implements UserDetails {
     @Builder.Default
     private Role role = Role.USER;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cart_id")
+    @OneToOne(mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
     private Cart cart;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -44,12 +46,19 @@ public class User implements UserDetails {
 
     // UserDetails implementation fields
     @Column(nullable = false)
+    @Builder.Default
     private boolean enabled = true;
+
     @Column(nullable = false)
+    @Builder.Default
     private boolean accountNonExpired = true;
+
     @Column(nullable = false)
+    @Builder.Default
     private boolean accountNonLocked = true;
+
     @Column(nullable = false)
+    @Builder.Default
     private boolean credentialsNonExpired = true;
 
     // last_login, created_at, updated_at
