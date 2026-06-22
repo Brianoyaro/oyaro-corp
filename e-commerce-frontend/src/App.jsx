@@ -12,6 +12,10 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 
+import { AdminHome } from './pages/admin/AdminHome';
+import CategoryForm from './pages/CategoryForm';
+import  ProductForm  from './pages/ProductForm';
+
 // logon, signup, orders components
 
 const queryClient = new QueryClient({
@@ -37,6 +41,12 @@ function App() {
                       <Route path="/home" element={<Home />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="/signup" element={<Signup />} />
+
+
+                      <Route path="/create-category" element={<CategoryForm />} />
+                      <Route path="/create-product" element={<ProductForm /> } />
+                      <Route path="/admin-home" element={<AdminHome />} />
+                      
 
                       //
                       <Route

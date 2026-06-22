@@ -14,9 +14,10 @@ export function Dashboard() {
     
     if (user.role.toLowerCase().includes("ADMIN".toLowerCase())) {
         // navigate them to admin-dahboard page
-        return(
-         <p>Admin Dashboard</p>
-        )
+        // return(
+        //  <p>Admin Dashboard</p>
+        // )
+        navigate('/admin-home', {replace:true})
     } else {
         // navigate them to Home which requires no authentication or the previous url which forced them to login
         // return <p>Client Dashboard</p>
