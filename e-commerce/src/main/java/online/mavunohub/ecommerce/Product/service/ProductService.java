@@ -23,10 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,35 +75,74 @@ public class ProductService {
         }
     }
 
-    private void attachImages(Product product, List<MultipartFile> imageFiles, Boolean isUpdateOperation) {
-        log.info("Attaching images to the product.");
-
-        List<ProductImage> productImages = new ArrayList<>();
-//        if (!isUpdateOperation) {
-//            // if not an update operation, it means that we are creating a new product hence productImages needs to be initialized with an empty list
-//            productImages = new ArrayList<>();
-//        } else {
-//            // It is an update operation meaning that product has some images
+//    private void attachImages(Product product, List<MultipartFile> imageFiles, Boolean isUpdateOperation) {
+//        log.info(imageFiles.toString());
+//        log.info("Attaching images to the product.");
+//
+//        List<ProductImage> productImages = new ArrayList<>();
+//
+//        if (isUpdateOperation) {
 //            productImages = product.getProductImages();
+//        };
+//        log.warn("attaching {} images. object initially has {} images", imageFiles.size(), productImages.size());
+//        for (MultipartFile file : imageFiles) {
+//            String url = fileStorageService.saveFile(file);
+//            ProductImage productImage = ProductImage.builder()
+//                    .product(product)
+//                    .imgUrl(url)
+//                    .isPrimary(false)
+//                    .build();
+//            productImage = productImagesRepo.save(productImage);
+//            productImages.add(productImage);
 //        }
+//        productImages.getFirst().setIsPrimary(true);
+//        product.setProductImages(productImages);
+//        if (productImages != null) {
+//            log.info("Attached {} images to the product.",  productImages.size());//Todo: this fails when productImages is null
+//        }
+//    }
 
-        if (isUpdateOperation) {
-            productImages = product.getProductImages();
-        };
-        log.warn("attaching {} images. object initially has {} images", imageFiles.size(), productImages.size());
+    private void attachImages(Product product,
+                              List<MultipartFile> imageFiles,
+                              Boolean isUpdateOperation) {
+
+        if (imageFiles == null || imageFiles.isEmpty()) {
+            log.info("No images supplied.");
+            return;
+        }
+
+        List<ProductImage> productImages =
+                isUpdateOperation
+                        ? new ArrayList<>(product.getProductImages())
+                        : new ArrayList<>();
+
+        log.warn(
+                "Attaching {} images. Product initially has {} images",
+                imageFiles.size(),
+                productImages.size()
+        );
+
         for (MultipartFile file : imageFiles) {
             String url = fileStorageService.saveFile(file);
-            ProductImage productImage = ProductImage.builder()
+
+            ProductImage image = ProductImage.builder()
                     .product(product)
                     .imgUrl(url)
                     .isPrimary(false)
                     .build();
-            productImage = productImagesRepo.save(productImage);
-            productImages.add(productImage);
+
+            productImages.add(image);
         }
-        productImages.getFirst().setIsPrimary(true);
+
+        productImages.forEach(img -> img.setIsPrimary(false));
+
+        if (!productImages.isEmpty()) {
+            productImages.getFirst().setIsPrimary(true);
+        }
+
         product.setProductImages(productImages);
-        log.info("Attached {} images to the product.",  productImages.size());
+
+        log.info("Attached {} images to the product.", productImages.size());
     }
 
     private void attachAttributes(Product product, List<ProductAttributesRequestDto> productAttributesRequestList) {
@@ -223,42 +260,101 @@ public class ProductService {
             attachImages(product, newImageFiles, true);
             productRepo.save(product);
 
-            log.info("starting to update attributes for product");
-            // update attributes
-            List<String> keys = product.getAttributes().stream()
-                    .map(attr -> attr.getCategoryAttribute().getName())
-                    .toList();
-            Set<String> savedProductAttributeKeys = new HashSet<>(keys);
-            Product finalProduct = product;
-            productAttributesRequestList.forEach(attr -> {
-                if (savedProductAttributeKeys.contains(attr.getAttributeName())) {
-                    // this key is present in this product. We should update the value instead of creating a new productAttributeValue
-                    for (int i = 0; i < finalProduct.getAttributes().size(); i++) {
-                        ProductAttributeValues productAttr = finalProduct.getAttributes().get(i);
-                        if (productAttr.getCategoryAttribute().getName().equalsIgnoreCase(attr.getAttributeName())) {
-                            productAttr.setValue(attr.getAttributeValue());
-                            productAttributesValuesRepo.save(productAttr);//should I save this and the product to database? TODO question. GOOGLE.
-                        }
-                    }
-                } else {
-                    // We create a new productAttributeKey
-                    List<CategoryAttribute> productCategoryAttributes = finalProduct.getCategory().getAttributes();
-                    for (CategoryAttribute productCategoryAttr : productCategoryAttributes) {//
-                        if (productCategoryAttr.getName().equalsIgnoreCase(attr.getAttributeName())) {
-                            ProductAttributeValues productAttributeValue = ProductAttributeValues.builder()
-                                    .product(finalProduct)
-                                    .value(attr.getAttributeValue())
-                                    .categoryAttribute(productCategoryAttr)
-                                    .build();
-                            productAttributeValue = productAttributesValuesRepo.save(productAttributeValue);
-                            finalProduct.getAttributes().add(productAttributeValue);
-                            productRepo.save(finalProduct);
-                        }
-                    }
-                }
-            });
+            log.info("Starting to update attributes for product {}", productId);
 
-            product = productRepo.save(finalProduct);
+            /*
+             * Frontend attribute names
+             */
+            Set<String> incomingAttributeNames =
+                    productAttributesRequestList.stream()
+                            .map(attr -> attr.getAttributeName().toLowerCase())
+                            .collect(Collectors.toSet());
+
+            /*
+             * Remove attributes deleted on frontend
+             */
+            product.getAttributes().removeIf(existingAttribute ->
+                    !incomingAttributeNames.contains(
+                            existingAttribute.getCategoryAttribute()
+                                    .getName()
+                                    .toLowerCase()
+                    )
+            );
+
+            /*
+             * Build lookup map for existing attributes
+             */
+            Map<String, ProductAttributeValues> existingAttributes =
+                    product.getAttributes()
+                            .stream()
+                            .collect(Collectors.toMap(
+                                    attr -> attr.getCategoryAttribute()
+                                            .getName()
+                                            .toLowerCase(),
+                                    Function.identity()
+                            ));
+
+            /*
+             * Category attributes lookup
+             */
+            Map<String, CategoryAttribute> categoryAttributesMap =
+                    product.getCategory()
+                            .getAttributes()
+                            .stream()
+                            .collect(Collectors.toMap(
+                                    attr -> attr.getName().toLowerCase(),
+                                    Function.identity()
+                            ));
+
+            /*
+             * Update existing attributes or create new ones
+             */
+            for (ProductAttributesRequestDto incomingAttr : productAttributesRequestList) {
+
+                String attributeName =
+                        incomingAttr.getAttributeName().toLowerCase();
+
+                ProductAttributeValues existing =
+                        existingAttributes.get(attributeName);
+
+                if (existing != null) {
+
+                    /*
+                     * Update existing value
+                     */
+                    existing.setValue(incomingAttr.getAttributeValue());
+
+                } else {
+
+                    /*
+                     * Create new attribute
+                     */
+                    CategoryAttribute categoryAttribute =
+                            categoryAttributesMap.get(attributeName);
+
+                    if (categoryAttribute == null) {
+                        throw new RuntimeException(
+                                "Category attribute '" +
+                                        incomingAttr.getAttributeName() +
+                                        "' does not exist"
+                        );
+                    }
+
+                    ProductAttributeValues newAttribute =
+                            ProductAttributeValues.builder()
+                                    .product(product)
+                                    .categoryAttribute(categoryAttribute)
+                                    .value(incomingAttr.getAttributeValue())
+                                    .build();
+
+                    product.getAttributes().add(newAttribute);
+                }
+            }
+
+            /*
+             * Save once
+             */
+            product = productRepo.save(product);
             return mapper(product);
         } catch (Exception e) {
             log.error("Error while updating product.");
@@ -295,6 +391,7 @@ public class ProductService {
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .categoryName(product.getCategory().getName())
+                .categoryId(product.getCategory().getId())
                 .images(productImageResponseDtoList)
                 .attributes(productAttributeResponseDtoList)
                 .build();

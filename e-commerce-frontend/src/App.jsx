@@ -9,12 +9,15 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Dashboard } from './components/Dashboard';
 import { Home } from './pages/Home';
-import { Login } from './pages/Login';
-import { Signup } from './pages/Signup';
+import { Login } from './pages/auth/Login';
+import { Signup } from './pages/auth/Signup';
 
 import { AdminHome } from './pages/admin/AdminHome';
-import CategoryForm from './pages/CategoryForm';
+import CreateCategory from './pages/admin/CreateCategory';
+import EditCategory from './pages/admin/EditCategory';
+
 import  ProductForm  from './pages/ProductForm';
+import EditProduct from './pages/EditProductForm';
 
 // logon, signup, orders components
 
@@ -39,20 +42,55 @@ function App() {
                     <Routes>
                       //
                       <Route path="/home" element={<Home />} />
+                      <Route path="/" element={<Dashboard />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="/signup" element={<Signup />} />
 
 
-                      <Route path="/create-category" element={<CategoryForm />} />
+                      {/* <Route path="/create-category" element={<CreateCategory />} />
+                      <Route path="/edit-category/:id" element={<EditCategory />} /> */}
+
                       <Route path="/create-product" element={<ProductForm /> } />
-                      <Route path="/admin-home" element={<AdminHome />} />
+                      <Route path="/edit-product/:id" element={<EditProduct />} />
                       
+                      <Route
+                        path="/admin-home"
+                        element={
+                          <ProtectedRoute
+                            roles={["ADMIN"]}
+                          >
+                            <AdminHome />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/create-category"
+                        element={
+                          <ProtectedRoute
+                            roles={["ADMIN"]}
+                          >
+                            <CreateCategory />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/edit-category/:id"
+                        element={
+                          <ProtectedRoute
+                            roles={["ADMIN"]}
+                          >
+                            <EditCategory />
+                          </ProtectedRoute>
+                        }
+                      />
 
                       //
                       <Route
                         path="/dashboard"
                         element={
-                          <ProtectedRoute>
+                          <ProtectedRoute
+                            roles={["ADMIN", "USER"]}
+                          >
                             <Dashboard />
                           </ProtectedRoute>
                         }

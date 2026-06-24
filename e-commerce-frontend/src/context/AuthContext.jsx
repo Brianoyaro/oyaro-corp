@@ -144,8 +144,8 @@ export function AuthProvider({ children }) {
   const isAuthenticated = !!accessToken
   const value = {
     // user,
-    accessToken,
-    refreshToken,
+    accessToken,  //I am not using this anywhere. I have stored it in localStorage and I am using it from there in api.js
+    refreshToken, //I am not using this anywhere. I have stored it in localStorage and I am using it from there in api.js
     isLoading,
     isAuthenticated,
     // error,

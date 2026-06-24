@@ -74,15 +74,16 @@ public class ProductController {
             @RequestPart("imagesToKeep") String imageUrlsToKeepList
     ){
         try {
+            log.info("In product controller, updating a new product.");
             UpdateProductRequestDto productUpdateRequest =
                     objectMapper.readValue(productUpdateJson, UpdateProductRequestDto.class);
-
+            log.info("updateProductRequestDto: {}", productUpdateRequest);
             List<ProductAttributesRequestDto> productAttributesRequestList =
                     objectMapper.readValue(
                             productAttributesJson,
                             new TypeReference<List<ProductAttributesRequestDto>>() {}
                     );
-
+            log.info("productAttributesRequestList: {}", productAttributesRequestList);
             List<String> imageUrlsToKeep = objectMapper.readValue(
                     imageUrlsToKeepList,
                     new TypeReference<List<String>>() {}

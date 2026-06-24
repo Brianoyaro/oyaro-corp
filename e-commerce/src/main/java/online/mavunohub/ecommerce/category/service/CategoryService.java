@@ -6,6 +6,7 @@ import online.mavunohub.ecommerce.AttributeDefinitions.model.CategoryAttribute;
 import online.mavunohub.ecommerce.AttributeDefinitions.repository.CategoryAttributeDefinitionsRepo;
 import online.mavunohub.ecommerce.AttributesValues.dto.ProductAttributeResponseDto;
 import online.mavunohub.ecommerce.AttributesValues.model.ProductAttributeValues;
+import online.mavunohub.ecommerce.AttributesValues.repository.ProductAttributesValuesRepo;
 import online.mavunohub.ecommerce.Product.dto.ProductResponseDto;
 import online.mavunohub.ecommerce.Product.model.Product;
 import online.mavunohub.ecommerce.ProductImages.dto.ProductImageResponseDto;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 public class CategoryService {
     private final CategoryRepo categoryRepo;
     private final CategoryAttributeDefinitionsRepo categoryAttributeDefinitionsRepo;
+    private final ProductAttributesValuesRepo productAttributesValuesRepo;
 
     // Create
     public CategoryResponseDto createCategory(CategoryRequestDto categoryRequestDto, List<CategoryAttributeRequestDto> categoryAttributeRequestDtoList) {
@@ -209,7 +211,7 @@ public class CategoryService {
         }
     }
 
-    // Update
+    /*// Update
     public CategoryResponseDto updateCategory(
             Long id,
             CategoryRequestDto categoryRequestDto,
@@ -254,6 +256,125 @@ public class CategoryService {
         } catch (Exception e) {
             log.error("Error updating category.");
             log.error("StackTrace: {}", (Object) e.getStackTrace());
+            throw e;
+        }
+    }*/
+    public CategoryResponseDto updateCategory(
+            Long id,
+            CategoryRequestDto categoryRequestDto,
+            List<CategoryAttributeRequestDto> categoryAttributeRequestDtoList
+    ) {
+        try {
+            Category category = categoryRepo.findById(id)
+                    .orElseThrow(() ->
+                            new RuntimeException("Category with ID: " + id + " not found."));
+
+            // =====================================================
+            // UPDATE CATEGORY DETAILS
+            // =====================================================
+
+            if (categoryRequestDto.getCategoryName() != null
+                    && !categoryRequestDto.getCategoryName().trim().isEmpty()
+                    && !categoryRequestDto.getCategoryName().equalsIgnoreCase(category.getName())) {
+
+                category.setName(categoryRequestDto.getCategoryName().trim());
+            }
+
+            if (categoryRequestDto.getCategoryDescription() != null) {
+                category.setDescription(categoryRequestDto.getCategoryDescription());
+            }
+
+            // =====================================================
+            // FILTER INVALID ATTRIBUTES
+            // =====================================================
+
+            List<CategoryAttributeRequestDto> validAttributes =
+                    categoryAttributeRequestDtoList.stream()
+                            .filter(attr ->
+                                    attr.getName() != null &&
+                                            !attr.getName().trim().isEmpty()
+                            )
+                            .toList();
+
+            // =====================================================
+            // INCOMING ATTRIBUTE NAMES
+            // =====================================================
+
+            Set<String> incomingNames = validAttributes.stream()
+                    .map(attr -> attr.getName().trim().toLowerCase())
+                    .collect(Collectors.toSet());
+
+            // =====================================================
+            // DELETE REMOVED ATTRIBUTES
+            // =====================================================
+
+            List<CategoryAttribute> attributesToRemove =
+                    category.getAttributes().stream()
+                            .filter(attr ->
+                                    !incomingNames.contains(
+                                            attr.getName().toLowerCase()
+                                    )
+                            )
+                            .toList();
+
+            for (CategoryAttribute attributeToRemove : attributesToRemove) {
+
+                log.warn("Removing category attribute: {}", attributeToRemove.getName());
+
+                // First remove all ProductAttributeValues
+                productAttributesValuesRepo
+                        .deleteAllByCategoryAttribute(attributeToRemove);
+
+                // Remove from category collection
+                category.getAttributes().remove(attributeToRemove);
+
+                // Delete CategoryAttribute itself
+//                categoryAttributeDefinitionsRepo.delete(attributeToRemove);
+                long usageCount =
+                        productAttributesValuesRepo.countByCategoryAttribute(attributeToRemove);
+
+                if (usageCount > 0) {
+                    productAttributesValuesRepo.deleteAllByCategoryAttribute(attributeToRemove);
+                }
+
+                categoryAttributeDefinitionsRepo.delete(attributeToRemove);
+            }
+
+            // =====================================================
+            // ADD NEW ATTRIBUTES
+            // =====================================================
+
+            Set<String> existingNames = category.getAttributes().stream()
+                    .map(attr -> attr.getName().toLowerCase())
+                    .collect(Collectors.toSet());
+
+            for (CategoryAttributeRequestDto dto : validAttributes) {
+
+                String attributeName = dto.getName().trim();
+
+                if (!existingNames.contains(attributeName.toLowerCase())) {
+
+                    CategoryAttribute categoryAttribute =
+                            CategoryAttribute.builder()
+                                    .name(attributeName)
+                                    .category(category)
+                                    .build();
+
+                    categoryAttribute =
+                            categoryAttributeDefinitionsRepo.save(categoryAttribute);
+
+                    category.getAttributes().add(categoryAttribute);
+
+                    log.info("Added category attribute: {}", attributeName);
+                }
+            }
+
+            category = categoryRepo.save(category);
+
+            return mapper(category);
+
+        } catch (Exception e) {
+            log.error("Error updating category", e);
             throw e;
         }
     }

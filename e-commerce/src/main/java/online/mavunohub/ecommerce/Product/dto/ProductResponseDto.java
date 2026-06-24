@@ -22,6 +22,8 @@ public class ProductResponseDto {
 
     private String categoryName;
 
+    private Long categoryId;
+
     // list of image URLs
     List<ProductImageResponseDto> images;
 
