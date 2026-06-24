@@ -2,24 +2,26 @@ import { useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-// todo. implement these. I prefer using shadcn ui where possible
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { Dashboard } from './components/Dashboard';
+
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
-import { Dashboard } from './components/Dashboard';
 import { Home } from './pages/Home';
+
+
+// Auth pages
 import { Login } from './pages/auth/Login';
 import { Signup } from './pages/auth/Signup';
 
+// Admin pages
 import { AdminHome } from './pages/admin/AdminHome';
 import CreateCategory from './pages/admin/CreateCategory';
 import EditCategory from './pages/admin/EditCategory';
+import EditProduct from './pages/admin/EditProduct';
+import CreateProduct from './pages/admin/CreateProduct';
 
-import  ProductForm  from './pages/ProductForm';
-import EditProduct from './pages/EditProductForm';
-
-// logon, signup, orders components
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,7 +52,7 @@ function App() {
                       {/* <Route path="/create-category" element={<CreateCategory />} />
                       <Route path="/edit-category/:id" element={<EditCategory />} /> */}
 
-                      <Route path="/create-product" element={<ProductForm /> } />
+                      <Route path="/create-product" element={<CreateProduct /> } />
                       <Route path="/edit-product/:id" element={<EditProduct />} />
                       
                       <Route
