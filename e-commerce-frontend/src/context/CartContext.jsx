@@ -10,10 +10,10 @@ const STORAGE_KEY = 'cart';
 
 const transformBackEndCart = (item) => {
     const API_IMAGE_BASE_URL = import.meta.env.VITE_API_IMAGE_BASE_URL || 'http://localhost:8080';
-    const imgUrl = `${API_IMAGE_BASE_URL}${item.imgageUrl}`
+    const imgUrl = `${API_IMAGE_BASE_URL}${item.imageUrl}`
 
     return {
-        id: item.id,//cartItemId from the database. I find it redundant here
+        // id: item.id,//cartItemId from the database. I find it redundant here
         productId: item.productId,
         productName: item.productName,
         unitPrice: item.unitPrice,
@@ -50,10 +50,10 @@ export function CartProvider({children}) {
                             await cartApi.addToCart({
                                 "productId": item.productId,
                                 "quantity": item.quantity
-                            });
+                        });
                             console.log(`Successfully uploaded ${item.productName} to the backend`)
                         } catch (error) {
-                            console.error(`Failed to migrate item: ${item.name}`)
+                            console.error(`Failed to migrate item: ${item.productName}`)
                         }
                     }
                     localStorage.removeItem(STORAGE_KEY)
@@ -67,7 +67,17 @@ export function CartProvider({children}) {
             } else {
                 // store in local storage
                 const storedCart = localStorage.getItem(STORAGE_KEY)
-                setCart(storedCart ? JSON.parse(storedCart) : []);
+                try {
+                    setCart(
+                        storedCart && storedCart !== "undefined"
+                        ? JSON.parse(storedCart)
+                        : []
+                    );
+                } catch (err) {
+                    console.error("Invalid cart data", err);
+                    localStorage.removeItem(STORAGE_KEY);
+                    setCart([]);
+                }
             }
         } catch (error) {
             //
@@ -89,8 +99,8 @@ export function CartProvider({children}) {
             if (isAuthenticated) {
                 await cartApi.addToCart
                 ({
-                    "productId": item.productId,
-                    "quantity": item.quantity
+                    "productId": item.productId ?? item.id,
+                    "quantity": item.quantity ?? 1
                 });
                 console.log(`Successfully uploaded ${item.productName} to the backend`)
                 // refetch update
@@ -103,13 +113,13 @@ export function CartProvider({children}) {
                 let updatedCart;
 
                 if (existingItem) {
-                    updatedCart = cart.map((product) =>
-                    product.productId === product.id
+                    updatedCart = cart.map((cartItem) =>
+                    cartItem.productId === item.id
                         ? { 
-                            ...product, 
-                            quantity: product.quantity + (item.quantity || 1) , 
-                            subTotal: (product.quantity + (item.quantity || 1)) * product.unitPrice}
-                        : product
+                            ...cartItem, 
+                            quantity: cartItem.quantity + (item.quantity || 1) , 
+                            subTotal: (cartItem.quantity + (item.quantity || 1)) * cartItem.unitPrice}
+                        : cartItem
                     );
                 } else {
                     updatedCart = [
@@ -145,20 +155,20 @@ export function CartProvider({children}) {
             setLoading(true);
             if (isAuthenticated) {
                 // Find the item to get its product ID
-                const item = cart.find(i => i.id === cartItemId);
+                const item = cart.find(i => i.productId === cartItemId);
                 if (item) {
                     // Call backend with product ID
-                    await cartAPI.removeFromCart(item.productId);
+                    await cartApi.removeFromCart(item.productId);
                     // Refetch cart from backend
                     const response = await cartApi.getCart();
-                    const backendCart = (response.items || []).map(transformBackendCart);
+                    const backendCart = (response || []).map(transformBackEndCart);
                     setCart(backendCart);
                 }
             } else {
                 // Update localStorage
                 const updatedCart = cart.filter((item) => item.productId !== cartItemId);
                 setCart(updatedCart);
-                localStorage.setItem(STORAGE_KEY, updateCart)
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCart))
             }
             console.log("Successfully removed product from cart")
         } catch (error) {
@@ -178,14 +188,14 @@ export function CartProvider({children}) {
                 // Remove all items from backend using product ID
                 for (const item of cart) {
                     try {
-                        await cartAPI.removeFromCart(item.productId);
+                        await cartApi.removeFromCart(item.productId);
                     } catch (err) {
                         console.warn(`⚠️ Failed to remove item ${item.id} from backend:`, err);
                     }
                 }
             }
             setCart([]);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify([]))
+            localStorage.removeItem(STORAGE_KEY);
             console.log("Successfully cleared the cart")
         } catch (error) {
             console.error("Error encountered during cart clearing operation")
@@ -207,18 +217,18 @@ export function CartProvider({children}) {
             //
             if (isAuthenticated) {
                 // Call backend with CartItem ID (not product ID)
-                await cartAPI.updateQuantity(cartItemId, quantity);
+                await cartApi.updateItem(cartItemId, quantity);
                 // Refetch cart from backend
-                const response = await cartAPI.getCart();
-                const backendCart = (response.items || []).map(transformBackendCart);
+                const response = await cartApi.getCart();
+                const backendCart = (response || []).map(transformBackEndCart);
                 setCart(backendCart);
             } else {
                 // Update localStorage - guest cart uses product ID
                 const updatedCart = cart.map((item) =>
-                    item.productId === cartItemId ? { ...item, quantity } : item
+                    item.productId === cartItemId ? { ...item, quantity, subTotal: quantity * item.unitPrice } : item
                 );
                 setCart(updatedCart);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(updateCart))
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCart))
             }
         } catch (error) {
             console.error("Error enctoured during product update")

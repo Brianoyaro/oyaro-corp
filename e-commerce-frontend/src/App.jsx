@@ -8,7 +8,7 @@ import { CartProvider } from './context/CartContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Dashboard } from './components/Dashboard';
 
-import { Navbar } from './components/Navbar';
+import Navbar from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
 

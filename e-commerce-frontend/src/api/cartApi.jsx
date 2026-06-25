@@ -6,7 +6,7 @@ export const cartApi =  {
             //
             console.log("Fetching user's cart from the backend");
             const response = await apiClient.get("/cart")
-            return response
+            return response.data
         } catch  (error) {
             console.error("Failed to fetch user's cart");
             throw new Error(error);
@@ -17,7 +17,7 @@ export const cartApi =  {
         try {
             console.log(`removing product with id: ${productId} from user's cart`)
             const response = await apiClient.delete(`/cart/${productId}`)
-            return response
+            return response.data
         } catch (error) {
             console.error("Could not remove item from cart{BACKEND")
             throw new Error(error)
@@ -28,7 +28,7 @@ export const cartApi =  {
         try {
             console.log("Clearing user's cart")
             const response = await apiClient.delete("/cart/clear/all")
-            return response
+            return response.data
         } catch (error) {
             console.error("Failed to clear user's cart")
             throw new Error(error)
@@ -38,8 +38,9 @@ export const cartApi =  {
     addToCart: async (data) => {
         try {
             console.log("adding item to cart")
-            const response = await apiClient.post("/cart/add", {data})
-            return response
+            const response = await apiClient.post("/cart/add", data)
+            console.log(response)
+            return response.data
         } catch (error) {
             console.error("Failed to add product to cart")
             throw new Error(error)
@@ -49,8 +50,8 @@ export const cartApi =  {
     updateItem: async (productId, newQuantity) => {
         try {
             console.log("Updating product quantity in cart")
-            const response = await apiClient.put(`/cart/update/${productId}`, newQuantity)
-            return response
+            const response = await apiClient.put(`/cart/update/${productId}`, { newQuantity: newQuantity})
+            return response.data
         } catch (error) {
             console.error("Failed to update product item in the cart")
             throw new Error(error)

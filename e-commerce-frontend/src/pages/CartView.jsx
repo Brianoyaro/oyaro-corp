@@ -98,7 +98,7 @@ export default function CartView() {
               {/* Image */}
 
               <img
-                src={`${baseUrl}${item.imgUrl}`}
+                src={item.imgUrl}
                 alt={item.productName}
                 className="
                   w-full
