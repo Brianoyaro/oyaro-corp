@@ -27,6 +27,7 @@ import CreateProduct from './pages/admin/CreateProduct';
 // normal user pages
 import ProductListView from './pages/ProductListView';
 import ProductDetailView from './pages/ProductDetailView';
+import CartView from './pages/CartView';
 
 
 const queryClient = new QueryClient({
@@ -63,6 +64,7 @@ function App() {
 
                       <Route path="/products" element={<ProductListView />} />
                       <Route path="/product/:id" element={<ProductDetailView />} />
+                      <Route path="/cart" element={<CartView />} />
 
                       <Route
                         path="/admin-home"
