@@ -80,7 +80,7 @@ export function Login() {
 
         {error && (
           <div className="mb-6 flex items-start gap-3 bg-red-50 border border-red-200 rounded-lg p-4">
-            <FaExclamationTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+            {/* <FaExclamationTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" /> */}
             <p className="text-red-700 text-sm">{error}</p>
           </div>
         )}
@@ -89,7 +89,7 @@ export function Login() {
           {/* Email */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              <FaEnvelope className="inline w-4 h-4 mr-2" />
+              {/* <FaEnvelope className="inline w-4 h-4 mr-2" /> */}
               Email Address
             </label>
             <input
@@ -109,7 +109,7 @@ export function Login() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                <FaLock className="inline w-4 h-4 mr-2" />
+                {/* <FaLock className="inline w-4 h-4 mr-2" /> */}
                 Password
               </label>
               <Link
@@ -142,7 +142,7 @@ export function Login() {
           >
             {isLoading ? (
               <>
-                <FaSpinner className="inline w-4 h-4 mr-2 animate-spin" />
+                {/* <FaSpinner className="inline w-4 h-4 mr-2 animate-spin" /> */}
                 Signing in...
               </>
             ) : (
