@@ -76,7 +76,7 @@ export default function ProductListView() {
 
     if (isLoading) {
         return (
-        <div className="max-w-7xl mx-auto px-4 py-10">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-10">
             <div className="animate-pulse space-y-10">
             {[1, 2, 3].map((item) => (
                 <div key={item}>
@@ -103,7 +103,7 @@ export default function ProductListView() {
         {/* HERO */}
 
         {/* <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
-            <div className="max-w-7xl mx-auto px-4 py-16">
+            <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-16">
 
             <div className="max-w-3xl">
                 <h1 className="text-5xl font-bold">
@@ -129,9 +129,9 @@ export default function ProductListView() {
 
             </div>
         </section> */}
-        <div className="max-w-7xl mx-auto px-4 pt-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-10">
             {/* Search */}
-            <div className="relative mb-8">
+            <div className="relative mb-6 sm:mb-8">
                 <Search
                 size={20}
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -147,6 +147,8 @@ export default function ProductListView() {
                     pl-12
                     pr-4
                     py-3
+                    text-sm
+                    sm:text-base
                     border
                     rounded-xl
                     focus:ring-2
@@ -158,12 +160,28 @@ export default function ProductListView() {
 
             {/* Category Tabs */}
 
-            <div className="flex gap-3 overflow-x-auto pb-2">
+            <div
+                className="
+                    sticky
+                    top-0
+                    z-20
+                    bg-white
+                    py-3
+                    flex
+                    gap-2
+                    overflow-x-auto
+                    scrollbar-hide
+                    mb-6
+                "
+            >
                 {categoryTabs.map((tab) => (
                 <button
                     key={tab.id}
                     onClick={() => setSelectedCategory(tab.id)}
                     className={`
+                    whitespace-nowrap
+                    text-sm
+                    sm:text-base
                     px-5
                     py-2
                     rounded-full
@@ -196,27 +214,28 @@ export default function ProductListView() {
 
         {/* CATEGORY SECTIONS */}
 
-        <div className="max-w-7xl mx-auto px-4 py-12 space-y-16">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-1 space-y-16">
 
             {filteredCategories?.map((category) => (
             <section key={category.id}>
 
                 {/* Category Header */}
 
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
 
                 <div>
-                    <h2 className="text-3xl font-bold text-gray-900">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
                     {category.name}
                     </h2>
 
-                    <p className="text-gray-500 mt-1">
+                    <p className="text-sm sm:text-base text-gray-500 mt-1">
                     {category.description}
                     </p>
                 </div>
 
-                <div className="hidden md:block">
-                    <span className="text-sm text-gray-500">
+                {/* <div className="hidden md:block"> */}
+                <div>
+                    <span className="text-xs sm:text-sm text-gray-500">
                     {category.products?.length || 0} Products
                     </span>
                 </div>
@@ -228,12 +247,13 @@ export default function ProductListView() {
                 {category.products?.length > 0 ? (
                 <div
                     className="
-                    flex
-                    gap-6
-                    overflow-x-auto
-                    pb-2
-                    lg:grid
-                    lg:grid-cols-4
+                        grid
+                        grid-cols-1
+                        sm:grid-cols-2
+                        lg:grid-cols-3
+                        xl:grid-cols-4
+                        gap-4
+                        sm:gap-6
                     "
                 >
                     {category.products.slice(0, 8).map((product) => {
@@ -246,8 +266,8 @@ export default function ProductListView() {
                         to={`/product/${product.id}`}
                         className="
                             group
-                            min-w-[280px]
-                            lg:min-w-0
+                            // min-w-[280px]
+                            // lg:min-w-0
                             bg-white
                             rounded-2xl
                             overflow-hidden
@@ -258,6 +278,9 @@ export default function ProductListView() {
                             transition-all
                             duration-300
                             hover:-translate-y-1
+                            flex
+                            flex-col
+                            h-full
                         "
                         >
 
@@ -273,7 +296,9 @@ export default function ProductListView() {
                                 alt={product.name}
                                 className="
                                     w-full
-                                    h-64
+                                    h-50
+                                    sm:h-60
+                                    lg:h-64
                                     object-cover
                                     transition-transform
                                     duration-500
@@ -295,7 +320,7 @@ export default function ProductListView() {
 
                         {/* CONTENT */}
 
-                        <div className="p-5">
+                        <div className="p-4 sm:p-5 flex flex-col flex-1">
                             <Link to={`/product/${product.id}`}>
                                 <h3
                                 className="
@@ -344,9 +369,10 @@ export default function ProductListView() {
                             )}
 
                             {/* Footer */}
-                            <div className="mt-5 flex items-center justify-between">
+                            <div className="mt-auto pt-5">
+                                <div className="flex items-center justify-between">
 
-                                <span className="text-2xl font-bold text-blue-600">
+                                <span className="text-xl sm:text-2xl font-bold text-blue-600">
                                     {currencyFormatter.format(product.price)}
                                 </span>
 
@@ -357,33 +383,36 @@ export default function ProductListView() {
                                     font-medium
                                     hover:underline
                                     "
-                                >
+                                    >
                                     View
                                 </Link>
 
+                            </div>
                                 </div>
 
-                                <button
-                                onClick={(e) => {
+                                <button onClick={(e) => {
                                     e.stopPropagation();
-
                                     // TODO:
                                     // addToCart(product.id, 1)
-                                }}
-                                className="
-                                    w-full
-                                    mt-4
-                                    flex
-                                    items-center
-                                    justify-center
-                                    gap-2
-                                    bg-blue-600
-                                    text-white
-                                    py-3
-                                    rounded-xl
-                                    hover:bg-blue-700
-                                    transition
-                                "
+                                    }}
+                                    className="
+                                        w-full
+                                        mt-4
+                                        flex
+                                        items-center
+                                        justify-center
+                                        gap-2
+                                        bg-blue-600
+                                        whitespace-nowrap
+                                        text-sm
+                                        sm:text-base
+                                        text-white
+                                        sm:py-3
+                                        py-2.5
+                                        rounded-xl
+                                        hover:bg-blue-700
+                                        transition
+                                    "
                                 >
                                 <ShoppingCart size={18} />
                                 Add To Cart
