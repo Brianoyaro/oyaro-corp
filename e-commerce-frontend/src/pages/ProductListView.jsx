@@ -2,12 +2,14 @@ import { Link } from "react-router-dom";
 import { ShoppingBag, ArrowRight, ShoppingCart, Search } from "lucide-react";
 import { useCategories } from "../hook/useCategory";
 import { useMemo, useState } from "react";
+import { useCart } from "../hook/useCart";
 
 
 export default function ProductListView() {
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
     const { data: categoriesData, isLoading } = useCategories();
+    const { addToCart, isLoading: cartLoading } = useCart();
     
     const baseUrl = "http://localhost:8080";
 
@@ -388,10 +390,22 @@ export default function ProductListView() {
                             </div>
                                 </div>
 
-                                <button onClick={(e) => {
-                                    e.stopPropagation();
-                                    // TODO:
-                                    // addToCart(product.id, 1)
+                                <button
+                                    onClick={async (e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+
+                                        try {
+                                        await addToCart({
+                                            id: product.id,
+                                            name: product.name,
+                                            price: product.price,
+                                            categoryName: category.name,
+                                            images: product.images,
+                                        });
+                                        } catch (error) {
+                                        console.error("Failed to add product to cart", error);
+                                        }
                                     }}
                                     className="
                                         w-full
@@ -409,10 +423,14 @@ export default function ProductListView() {
                                         hover:bg-blue-700
                                         active:bg-blue-800
                                         transition
+                                        disabled:opacity-50
+                                        disabled:cursor-not-allowed
                                     "
-                                >
-                                <ShoppingCart size={16} className="sm:w-4.5 sm:h-4.5" />
-                                Add To Cart
+                                    disabled={cartLoading}
+                                    >
+                                    <ShoppingCart size={16} />
+
+                                    {cartLoading ? "Adding..." : "Add To Cart"}
                                 </button>
 
                         </div>

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Minus, Plus } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Thumbs } from "swiper/modules";
+import { useCart } from "../hook/useCart";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -13,6 +14,8 @@ import { useProduct } from "../hook/useProducts";
 export default function ProductDetailView() {
   const { id } = useParams();
   const { data: product, isLoading } = useProduct(id);
+  const { addToCart, isLoading:cartLoading } = useCart();
+
 
   const baseUrl = "http://localhost:8080";
 
@@ -27,6 +30,23 @@ export default function ProductDetailView() {
 
     return primary ? [primary, ...others] : product.images;
   }, [product]);
+
+  const handleAddToCart = async () => {
+    try {
+        await addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity,
+        categoryName: product.category?.name,
+        images: product.images,
+        });
+
+        alert("Product added to cart");
+    } catch (error) {
+        console.error("Failed to add item to cart", error);
+        alert("Failed to add item to cart");
+    }};
 
   const incrementQty = () => setQuantity((prev) => prev + 1);
 
@@ -244,20 +264,24 @@ export default function ProductDetailView() {
 
           <div className="mt-6 sm:mt-8 md:mt-10 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
             <button
-              className="
-                flex-1
-                bg-blue-600
-                text-white
-                text-sm sm:text-base
-                py-3 sm:py-4
-                rounded-xl
-                hover:bg-blue-700
-                active:bg-blue-800
-                transition
-                font-semibold
-              "
-            >
-              Add To Cart
+                onClick={handleAddToCart}
+                disabled={cartLoading}
+                className="
+                    flex-1
+                    bg-blue-600
+                    text-white
+                    text-sm sm:text-base
+                    py-3 sm:py-4
+                    rounded-xl
+                    hover:bg-blue-700
+                    active:bg-blue-800
+                    transition
+                    font-semibold
+                    disabled:opacity-50
+                    disabled:cursor-not-allowed
+                "
+                >
+                {cartLoading ? "Adding..." : "Add To Cart"}
             </button>
 
             <button

@@ -3,6 +3,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
+
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Dashboard } from './components/Dashboard';
 
@@ -41,6 +43,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <CartProvider>
             <Router>
               <div className="min-h-screen bg-white flex-flex-col">
                 <Navbar />
@@ -128,6 +131,7 @@ function App() {
                 <Footer />
               </div>
             </Router>
+          </ CartProvider>
       </AuthProvider>
     </QueryClientProvider>
   )
