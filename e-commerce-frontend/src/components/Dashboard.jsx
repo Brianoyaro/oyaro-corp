@@ -16,7 +16,8 @@ export function Dashboard() {
     if (role.includes('admin')) {
       navigate('/admin-home', { replace: true });
     } else {
-      navigate('/home', { replace: true });
+      // navigate('/home', { replace: true });
+      navigate('/products', { replace: true });
     }
   }, [isLoading, user, navigate]);
 

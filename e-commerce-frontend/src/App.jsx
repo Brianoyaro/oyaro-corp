@@ -22,6 +22,10 @@ import EditCategory from './pages/admin/EditCategory';
 import EditProduct from './pages/admin/EditProduct';
 import CreateProduct from './pages/admin/CreateProduct';
 
+// normal user pages
+import ProductListView from './pages/ProductListView';
+import ProductDetailView from './pages/ProductDetailView';
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,17 +48,19 @@ function App() {
                     <Routes>
                       //
                       <Route path="/home" element={<Home />} />
-                      <Route path="/" element={<Dashboard />} />
+                      <Route path="/" element={<Home />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="/signup" element={<Signup />} />
 
 
-                      {/* <Route path="/create-category" element={<CreateCategory />} />
-                      <Route path="/edit-category/:id" element={<EditCategory />} /> */}
 
-                      <Route path="/create-product" element={<CreateProduct /> } />
-                      <Route path="/edit-product/:id" element={<EditProduct />} />
-                      
+                      {/* <Route path="/create-product" element={<CreateProduct /> } />
+                      <Route path="/edit-product/:id" element={<EditProduct />} /> */}
+
+
+                      <Route path="/products" element={<ProductListView />} />
+                      <Route path="/product/:id" element={<ProductDetailView />} />
+
                       <Route
                         path="/admin-home"
                         element={
@@ -82,6 +88,26 @@ function App() {
                             roles={["ADMIN"]}
                           >
                             <EditCategory />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/create-product"
+                        element={
+                          <ProtectedRoute
+                            roles={["ADMIN"]}
+                          >
+                            <CreateProduct />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/edit-product/:id"
+                        element={
+                          <ProtectedRoute
+                            roles={["ADMIN"]}
+                          >
+                            <EditProduct />
                           </ProtectedRoute>
                         }
                       />
