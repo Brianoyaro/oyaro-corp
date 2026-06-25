@@ -76,17 +76,17 @@ export default function ProductListView() {
 
     if (isLoading) {
         return (
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-10">
-            <div className="animate-pulse space-y-10">
+        <div className="max-w-7xl mx-auto px-2 xs:px-3 sm:px-4 lg:px-6 py-6 sm:py-8 md:py-10">
+            <div className="animate-pulse space-y-8 sm:space-y-12">
             {[1, 2, 3].map((item) => (
                 <div key={item}>
-                <div className="h-8 w-56 bg-gray-200 rounded mb-6" />
+                <div className="h-6 sm:h-8 w-40 sm:w-56 bg-gray-200 rounded mb-4 sm:mb-6" />
 
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                     {[1, 2, 3, 4].map((card) => (
                     <div
                         key={card}
-                        className="bg-gray-200 h-80 rounded-xl"
+                        className="bg-gray-200 h-56 sm:h-64 md:h-72 rounded-xl"
                     />
                     ))}
                 </div>
@@ -129,12 +129,12 @@ export default function ProductListView() {
 
             </div>
         </section> */}
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-10">
+        <div className="max-w-7xl mx-auto px-2 xs:px-3 sm:px-4 lg:px-6 py-6 sm:py-8 md:py-10">
             {/* Search */}
-            <div className="relative mb-6 sm:mb-8">
+            <div className="relative mb-5 sm:mb-6 md:mb-8">
                 <Search
-                size={20}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+                className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400"
                 />
 
                 <input
@@ -144,9 +144,9 @@ export default function ProductListView() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="
                     w-full
-                    pl-12
-                    pr-4
-                    py-3
+                    pl-10 sm:pl-12
+                    pr-3 sm:pr-4
+                    py-2.5 sm:py-3
                     text-sm
                     sm:text-base
                     border
@@ -166,12 +166,13 @@ export default function ProductListView() {
                     top-0
                     z-20
                     bg-white
-                    py-3
+                    py-2 sm:py-3
                     flex
                     gap-2
                     overflow-x-auto
                     scrollbar-hide
-                    mb-6
+                    mb-5 sm:mb-6
+                    shadow-sm
                 "
             >
                 {categoryTabs.map((tab) => (
@@ -180,13 +181,12 @@ export default function ProductListView() {
                     onClick={() => setSelectedCategory(tab.id)}
                     className={`
                     whitespace-nowrap
-                    text-sm
-                    sm:text-base
-                    px-5
-                    py-2
+                    text-xs sm:text-sm md:text-base
+                    px-3 sm:px-5
+                    py-1.5 sm:py-2
                     rounded-full
-                    whitespace-nowrap
                     transition
+                    flex-shrink-0
                     ${
                         selectedCategory === tab.id
                         ? "bg-blue-600 text-white"
@@ -199,12 +199,12 @@ export default function ProductListView() {
                 ))}
             </div>
             {filteredCategories.length === 0 && (
-                <div className="text-center py-20">
-                    <h2 className="text-2xl font-semibold">
+                <div className="text-center py-12 sm:py-16 md:py-20">
+                    <h2 className="text-xl sm:text-2xl font-semibold">
                     No products found
                     </h2>
 
-                    <p className="text-gray-500 mt-2">
+                    <p className="text-sm sm:text-base text-gray-500 mt-2">
                     Try a different search term.
                     </p>
                 </div>
@@ -214,27 +214,26 @@ export default function ProductListView() {
 
         {/* CATEGORY SECTIONS */}
 
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-1 space-y-16">
+        <div className="max-w-7xl mx-auto px-2 xs:px-3 sm:px-4 lg:px-6 py-1 space-y-12 sm:space-y-16">
 
             {filteredCategories?.map((category) => (
             <section key={category.id}>
 
                 {/* Category Header */}
 
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-5 sm:mb-6">
 
-                <div>
-                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                <div className="flex-1">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
                     {category.name}
                     </h2>
 
-                    <p className="text-sm sm:text-base text-gray-500 mt-1">
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
                     {category.description}
                     </p>
                 </div>
 
-                {/* <div className="hidden md:block"> */}
-                <div>
+                <div className="text-right">
                     <span className="text-xs sm:text-sm text-gray-500">
                     {category.products?.length || 0} Products
                     </span>
@@ -245,6 +244,7 @@ export default function ProductListView() {
                 {/* Products */}
 
                 {category.products?.length > 0 ? (
+                <>
                 <div
                     className="
                         grid
@@ -252,8 +252,7 @@ export default function ProductListView() {
                         sm:grid-cols-2
                         lg:grid-cols-3
                         xl:grid-cols-4
-                        gap-4
-                        sm:gap-6
+                        gap-3 sm:gap-4 md:gap-6
                     "
                 >
                     {category.products.slice(0, 8).map((product) => {
@@ -296,9 +295,7 @@ export default function ProductListView() {
                                 alt={product.name}
                                 className="
                                     w-full
-                                    h-50
-                                    sm:h-60
-                                    lg:h-64
+                                    h-40 sm:h-48 md:h-56 lg:h-64
                                     object-cover
                                     transition-transform
                                     duration-500
@@ -320,12 +317,12 @@ export default function ProductListView() {
 
                         {/* CONTENT */}
 
-                        <div className="p-4 sm:p-5 flex flex-col flex-1">
+                        <div className="p-3 sm:p-4 md:p-5 flex flex-col flex-1">
                             <Link to={`/product/${product.id}`}>
                                 <h3
                                 className="
                                     font-semibold
-                                    text-lg
+                                    text-base sm:text-lg
                                     text-gray-900
                                     line-clamp-1
                                 "
@@ -336,8 +333,8 @@ export default function ProductListView() {
 
                             <p
                             className="
-                                mt-2
-                                text-sm
+                                mt-1 sm:mt-2
+                                text-xs sm:text-sm
                                 text-gray-500
                                 line-clamp-2
                             "
@@ -348,7 +345,7 @@ export default function ProductListView() {
                             {/* Attributes */}
 
                             {product.attributes?.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-4">
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3 sm:mt-4">
                                 {product.attributes
                                 .slice(0, 2)
                                 .map((attribute) => (
@@ -356,7 +353,7 @@ export default function ProductListView() {
                                     key={attribute.id}
                                     className="
                                         px-2
-                                        py-1
+                                        py-0.5 sm:py-1
                                         bg-gray-100
                                         rounded-full
                                         text-xs
@@ -369,10 +366,10 @@ export default function ProductListView() {
                             )}
 
                             {/* Footer */}
-                            <div className="mt-auto pt-5">
-                                <div className="flex items-center justify-between">
+                            <div className="mt-auto pt-3 sm:pt-4 md:pt-5">
+                                <div className="flex items-center justify-between gap-2">
 
-                                <span className="text-xl sm:text-2xl font-bold text-blue-600">
+                                <span className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
                                     {currencyFormatter.format(product.price)}
                                 </span>
 
@@ -380,6 +377,7 @@ export default function ProductListView() {
                                     to={`/product/${product.id}`}
                                     className="
                                     text-blue-600
+                                    text-xs sm:text-sm
                                     font-medium
                                     hover:underline
                                     "
@@ -397,24 +395,23 @@ export default function ProductListView() {
                                     }}
                                     className="
                                         w-full
-                                        mt-4
+                                        mt-3 sm:mt-4
                                         flex
                                         items-center
                                         justify-center
                                         gap-2
                                         bg-blue-600
                                         whitespace-nowrap
-                                        text-sm
-                                        sm:text-base
+                                        text-xs sm:text-sm md:text-base
                                         text-white
-                                        sm:py-3
-                                        py-2.5
-                                        rounded-xl
+                                        py-2 sm:py-2.5 md:py-3
+                                        rounded-lg sm:rounded-xl
                                         hover:bg-blue-700
+                                        active:bg-blue-800
                                         transition
                                     "
                                 >
-                                <ShoppingCart size={18} />
+                                <ShoppingCart size={16} className="sm:w-4.5 sm:h-4.5" />
                                 Add To Cart
                                 </button>
 
@@ -424,17 +421,42 @@ export default function ProductListView() {
                     );
                     })}
                 </div>
+
+                {/* View More Button */}
+                {category.products?.length > 8 && (
+                  <div className="flex justify-center mt-6 sm:mt-8">
+                    <Link
+                      to={`/category/${category.id}`}
+                      className="
+                        inline-block
+                        px-6 sm:px-8
+                        py-2.5 sm:py-3
+                        bg-blue-600
+                        text-white
+                        text-sm sm:text-base
+                        font-semibold
+                        rounded-xl
+                        hover:bg-blue-700
+                        active:bg-blue-800
+                        transition
+                      "
+                    >
+                      View More Products
+                    </Link>
+                  </div>
+                )}
+                </>
                 ) : (
                 <div
                     className="
                     bg-gray-50
                     rounded-xl
                     border
-                    p-8
+                    p-6 sm:p-8
                     text-center
                     "
                 >
-                    <p className="text-gray-500">
+                    <p className="text-sm sm:text-base text-gray-500">
                     No products available in this category.
                     </p>
                 </div>
