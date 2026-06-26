@@ -124,7 +124,8 @@ public class SecurityConfig {
         // Allow specific origins (update for production)
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5174",
-                "http://localhost:5173"
+                "http://localhost:5173",
+		"https://oyaro-corp-frontend.onrender.com"
         ));
 
         // Allow specific HTTP methods
