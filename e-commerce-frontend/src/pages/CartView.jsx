@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import { useCart } from "../hook/useCart";
 import { useState, useMemo } from "react";
+import { useAuth } from "../hook/useAuth";
 
 
 export default function CartView() {
@@ -23,6 +24,8 @@ export default function CartView() {
     clearCart,
     getCartTotal,
   } = useCart();
+
+  const { isAuthenticated } = useAuth();
 
   const currencyFormatter = new Intl.NumberFormat("en-KE", {
     style: "currency",
@@ -382,7 +385,13 @@ export default function CartView() {
             </div>
 
             <button
-              onClick={() => setShowCheckoutModal(true)}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  navigate(`/login?next=${encodeURIComponent('/cart')}`);
+                  return;
+                }
+                setShowCheckoutModal(true);
+              }}
               className="
                 w-full
                 mt-6
@@ -397,6 +406,11 @@ export default function CartView() {
             >
               Proceed to Checkout
             </button>
+            {!isAuthenticated && (
+              <p className="mt-3 text-sm text-red-600">
+                Please sign in to continue to payment.
+              </p>
+            )}
 
             <Link
               to="/products"
