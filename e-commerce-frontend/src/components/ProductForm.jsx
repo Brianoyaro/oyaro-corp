@@ -9,59 +9,35 @@ import { useCreateProduct, useProduct, useUpdateProduct } from "../hook/useProdu
 
 import { useWatch } from "react-hook-form";
 
-const productSchema = z.object({
-  name: z.string().min(2, "Product name is required"),
-  description: z.string().min(5, "Description is required"),
-  price: z.coerce.number().positive("Price must be greater than 0"),
-  categoryId: z.coerce.number().min(1, "Select a category"),
+const baseProductSchema = z.object({
+  name: z.string().min(2),
+  description: z.string().min(5),
+  price: z.coerce.number().positive(),
+  categoryId: z.coerce.number().min(1),
   attributes: z.array(
     z.object({
-      attributeName: z.string().min(1),
-      attributeValue: z.string().min(1),
+      attributeName: z.string(),
+      attributeValue: z.string(),
     })
   ),
-  images: z.array(
-    z.object({
-      file: z.any(),
-    })
-  ).min(1, "At least one image is required"),
+});
+
+export const createProductSchema = baseProductSchema.extend({
+  images: z.array(z.object({ file: z.any() })).min(1),
+});
+
+export const editProductSchema = baseProductSchema.extend({
+  images: z.array(z.object({ file: z.any() })).optional(),
+  imagesToKeep: z.array(z.object({ id: z.number() })).optional(),
 });
 
 
 export default function ProductForm({mode = "create", productId = null}) {
-  const productSchema = z.object({
-    name: z.string().min(2, "Product name is required"),
-    description: z.string().min(5, "Description is required"),
-    price: z.coerce.number().positive("Price must be greater than 0"),
-    categoryId: z.coerce.number().min(1, "Select a category"),
-    attributes: z.array(
-      z.object({
-        attributeName: z.string(),
-        attributeValue: z.string(),
-      })
-    ),
-    
-  });
-  if ( mode === 'edit' ) {
-    productSchema.extend({
-      imagesToKeep: z.array(z.object({ id: z.number() })).optional(),
-      images: z.array(
-        z.object({
-          file: z.any(),
-        })
-      ).optional(),
-    });
-  }
-  if ( mode === 'create' ) {
-    productSchema.extend({
-      images: z.array(
-        z.object({
-          file: z.any(),
-        })
-      ).min(1, "At least one image is required"),
-    });
-  }
-
+  const schema = mode === "edit"
+  ? editProductSchema
+  : createProductSchema;
+  
+  //
 
   const baseUrl = import.meta.env.VITE_API_IMAGE_URL; // for image display
 
@@ -73,7 +49,7 @@ export default function ProductForm({mode = "create", productId = null}) {
     reset,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       name: "",
       description: "",
@@ -179,11 +155,14 @@ export default function ProductForm({mode = "create", productId = null}) {
     };
     formData.append("product", new Blob([JSON.stringify(productPayload)], { type: "application/json" }));
     formData.append("attributes", new Blob([JSON.stringify(data.attributes)], { type: "application/json" }));
-    if (mode === "edit" && data.images && data.images.length > 0) {
-      data.images.forEach((img) => formData.append("images", img.file));
-    } else if (mode === "create") {
+    if (data.images?.length > 0) {
       data.images.forEach((img) => formData.append("images", img.file));
     }
+    // if (mode === "edit" && data.images && data.images.length > 0) {
+    //   data.images.forEach((img) => formData.append("images", img.file));
+    // } else if (mode === "create") {
+    //   data.images.forEach((img) => formData.append("images", img.file));
+    // }
     return formData;
   };
 
