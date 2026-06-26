@@ -30,7 +30,12 @@ public class PaystackController {
             @RequestBody PaystackRequestDto paystackRequestDto
     ) {
         try {
-            String shippingAddress = paystackRequestDto.getShippingCounty() + paystackRequestDto.getShippingTown() + paystackRequestDto.getShippingStreet();
+//            String shippingAddress = paystackRequestDto.getShippingCounty() + paystackRequestDto.getShippingTown() + paystackRequestDto.getShippingStreet();
+            String shippingAddress =
+                    String.join(", ",
+                            paystackRequestDto.getShippingStreet(),
+                            paystackRequestDto.getShippingTown(),
+                            paystackRequestDto.getShippingCounty());
             PaystackResponseDto response = paystackService.initializePaystack(user, shippingAddress);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
@@ -42,9 +47,12 @@ public class PaystackController {
     }
 
     @PostMapping("/verify/{reference}")
-    public ResponseEntity<?> verifyPaystack(@PathVariable VerifyRequestDto verifyRequestDto, @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> verifyPaystack(@PathVariable String verifyRequest, @AuthenticationPrincipal User user) {
         try {
-            VerifyResponseDto response = paystackService.verifyPaystack(verifyRequestDto);
+            VerifyRequestDto verifyRequestDto = VerifyRequestDto.builder()
+                    .reference(verifyRequest)
+                    .build();
+            VerifyResponseDto response = paystackService.verifyPaystack(verifyRequestDto, user);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             log.error(e.getMessage());

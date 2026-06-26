@@ -14,16 +14,17 @@ export const paystackApi = {
         }
     },
 
-    verify: async (receipt) => {
+    verify: async (reference) => {
         try {
-            const response = await apiClient.post(`/paystack/${receipt}`)
+            const response = await apiClient.post(`/paystack/verify/${reference}`)
             return response.data
         } catch (error) {
-        const errorMessage =
+            const errorMessage =
             error.response?.data?.message ||
             error.message ||
             'Failed to fetch all products';
             throw new Error(errorMessage);
         }
-    }
+    },
+
 }

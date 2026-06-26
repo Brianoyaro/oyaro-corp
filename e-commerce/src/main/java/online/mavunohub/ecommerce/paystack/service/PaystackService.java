@@ -113,7 +113,7 @@ public class PaystackService {
      *
      * @return
      */
-    public VerifyResponseDto verifyPaystack(VerifyRequestDto request) {
+    public VerifyResponseDto verifyPaystack(VerifyRequestDto request, User user) {
         //
         String reference = request.getReference();
         Map response =
@@ -133,14 +133,20 @@ public class PaystackService {
                         .divide(BigDecimal.valueOf(100));
 
         Paystack payment = paystackRepo.findByReference(reference).orElseThrow();
+
+        if (!payment.getEmail().equals(user.getEmail())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        BigDecimal expected = payment.getAmount();
+        if (expected.compareTo(actualAmount) != 0) {
+            throw new RuntimeException("Payment amount mismatch.");
+        }
+
         if (status.equalsIgnoreCase("success")) {
             payment.setStatus(PaystackStatus.SUCCESS);
             // change order status
             payment.getOrder().setOrderStatus(OrderStatus.CONFIRMED);
-            BigDecimal expected = payment.getAmount();
-            if (expected.compareTo(actualAmount) != 0) {
-                throw new RuntimeException("Payment amount mismatch.");
-            }
         }
         paystackRepo.save(payment);
 

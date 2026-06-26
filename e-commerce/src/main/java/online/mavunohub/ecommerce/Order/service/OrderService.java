@@ -3,6 +3,7 @@ package online.mavunohub.ecommerce.Order.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import online.mavunohub.ecommerce.Authentication.model.User;
+import online.mavunohub.ecommerce.Authentication.repository.UserRepo;
 import online.mavunohub.ecommerce.Cart.model.Cart;
 import online.mavunohub.ecommerce.Cart.model.CartItem;
 import online.mavunohub.ecommerce.Order.Dto.OrderItemDto;
@@ -28,12 +29,15 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final OrderRepo orderRepo;
+    private final UserRepo userRepo;
 
     /**
      * Create order from authenticated user's cart items
      */
-    public OrderResponseDto createOrderFromCart(User user, String shippingAddress) {
-        log.info("Creating order from cart for user: {}", user.getId());
+    public OrderResponseDto createOrderFromCart(User principal, String shippingAddress) {
+        log.info("Creating order from cart for user: {}", principal.getId());
+        User user = userRepo.findById(principal.getId())
+                .orElseThrow();
         Cart cart = user.getCart();
         List<CartItem> cartItems = cart.getItems();
 

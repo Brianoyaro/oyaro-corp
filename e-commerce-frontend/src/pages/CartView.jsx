@@ -1,6 +1,7 @@
 import * as KenyaLocations from "kenya-locations";
 
 import PaystackPop from "@paystack/inline-js";
+import { paystackApi } from '../api/paystackApi';
 
 
 import { Link, useNavigate } from "react-router-dom";
@@ -77,8 +78,18 @@ export default function CartView() {
 
     try {
       setLoadingPayment(true);
+      //
+    
+      const initializeResponse = paystackApi.initialize(
+        {
+          contactName: shippingAddress.fullName,
+          contactPhone: shippingAddress.phone,
+          shippingStreet: shippingAddress.street,
+          shippingCounty: shippingAddress.county,
+          shippingTown: shippingAddress.town,
+        });
 
-      const response = await fetch(
+      /*const response = await fetch(
         "http://localhost:8080/api/paystack/initialize",
         {
           method: "POST",
@@ -96,7 +107,7 @@ export default function CartView() {
         throw new Error("Failed to initialize payment");
       }
 
-      const payment = await response.json();
+      const payment = await response.json();*/
 
       /**
        * Backend should return:
@@ -110,25 +121,26 @@ export default function CartView() {
 
       const popup = new PaystackPop();
 
-      popup.resumeTransaction(payment.accessCode, {
+      popup.resumeTransaction(initializeResponse.accessCode, {
         onSuccess: async () => {
           try {
-            const verify = await fetch(
+            const verify = await paystackApi.verify(initializeResponse.reference)
+            /*const verify = await fetch(
               `http://localhost:8080/api/paystack/verify/${payment.reference}`,
               {
                 method: "POST",
               }
-            );
+            );*/
 
-            if (!verify.ok) {
+            if (verify.status !==  "success") {
               throw new Error("Verification failed");
             }
 
             clearCart();
 
             setShowCheckoutModal(false);
-
-            navigate(`/orders/${payment.orderId}`);
+            alert("Payment completed successfully.")
+            navigate(`/orders/${initializeResponse.orderId}`);
           } catch (err) {
             console.error(err);
             alert("Payment verification failed.");
@@ -137,7 +149,13 @@ export default function CartView() {
 
         onCancel: () => {
           console.log("Customer cancelled payment.");
+          alert("Payment cancelled.");
         },
+
+        onError: (err) => {
+          console.error(err);
+          alert("Unable to process payment.");
+        }
       });
     } catch (err) {
       console.error(err);

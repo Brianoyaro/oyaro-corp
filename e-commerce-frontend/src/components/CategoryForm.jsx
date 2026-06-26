@@ -63,10 +63,10 @@ export default function CategoryForm({
     categoryData = data;
     isLoading = loading;
   }
-  console.log("Category Data:", categoryData);
-  console.log("Is Loading:", isLoading);
-  console.log("Mode:", mode);
-  console.log("Category ID:", categoryId);
+  // console.log("Category Data:", categoryData);
+  // console.log("Is Loading:", isLoading);
+  // console.log("Mode:", mode);
+  // console.log("Category ID:", categoryId);
 
 
   useEffect(() => {
