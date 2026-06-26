@@ -13,7 +13,7 @@ export function ProtectedRoute({
   children,
   roles = [],
  }) {
-  const { isAuthenticated, authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const {data: user, isLoading: profileLoading} = useProfile();
   const location = useLocation();
 

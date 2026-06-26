@@ -15,7 +15,7 @@ export default function CartView() {
   const [loadingPayment, setLoadingPayment] = useState(false);
 
 
-  const baseUrl = "http://localhost:8080"
+  const baseUrl = import.meta.env.VITE_API_IMAGE_URL;
   const {
     cart,
     updateCart,
@@ -93,7 +93,7 @@ export default function CartView() {
 
       popup.resumeTransaction(initializeResponse.accessCode, {
         
-        key:"pk_test_0a37ef52861a257521e0775d143888a7a9393b49", //store in .env
+        key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
 
         onSuccess: async () => {
           try {

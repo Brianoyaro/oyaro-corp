@@ -17,7 +17,8 @@ export default function ProductDetailView() {
   const { addToCart, isLoading:cartLoading } = useCart();
 
 
-  const baseUrl = "http://localhost:8080";
+  const baseUrl = import.meta.env.VITE_API_IMAGE_URL;
+  console.log(baseUrl)
 
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [quantity, setQuantity] = useState(1);

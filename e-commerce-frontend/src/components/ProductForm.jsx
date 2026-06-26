@@ -63,7 +63,7 @@ export default function ProductForm({mode = "create", productId = null}) {
   }
 
 
-  const baseUrl = "http://localhost:8080"; // for image display
+  const baseUrl = import.meta.env.VITE_API_IMAGE_URL; // for image display
 
   const {
     register,

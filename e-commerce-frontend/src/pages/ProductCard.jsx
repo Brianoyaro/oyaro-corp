@@ -10,8 +10,7 @@ export function ProductCard({
 //   const { success, error } = useToast();
 
   const API_IMAGE_BASE_URL =
-    import.meta.env.VITE_API_IMAGE_BASE_URL ||
-    "http://localhost:8080";
+    import.meta.env.VITE_API_BASE_URL;
 
   const primaryImage =
     product.images?.find((img) => img.isPrimary) ||

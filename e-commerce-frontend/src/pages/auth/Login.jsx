@@ -23,6 +23,7 @@ export function Login() {
   
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
+      console.log('already authenticated. What are you doing in /login')
       const searchParams = new URLSearchParams(location.search);
       const nextUrl = searchParams.get('next');
       navigate(nextUrl ?? '/dashboard', { replace: true });

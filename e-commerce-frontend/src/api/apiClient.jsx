@@ -25,10 +25,12 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
+
 // Add request interceptor to inject authorization token
 apiClient.interceptors.request.use(
   config => {
     const accessToken = localStorage.getItem('accessToken');
+
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -54,6 +56,7 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config;
 
     // Handle 401 (Unauthorized) or 403 (Forbidden - likely expired token)
+    // if (error.response?.status === 401 && originalRequest.url?.includes('/user')) {
     if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise(function (resolve, reject) {

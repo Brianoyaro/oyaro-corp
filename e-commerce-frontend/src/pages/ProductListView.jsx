@@ -11,7 +11,7 @@ export default function ProductListView() {
     const { data: categoriesData, isLoading } = useCategories();
     const { addToCart, isLoading: cartLoading } = useCart();
     
-    const baseUrl = "http://localhost:8080";
+    const baseUrl = import.meta.env.VITE_API_IMAGE_URL;
 
     const getPrimaryImage = (images = []) => {
         const primary = images.find((img) => img.isPrimary);

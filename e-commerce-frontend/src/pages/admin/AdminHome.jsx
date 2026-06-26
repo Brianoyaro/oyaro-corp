@@ -10,7 +10,7 @@ export  function AdminHome() {
   const { logout } = useAuth();
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
 
-  const baseUrl = "http://localhost:8080";//for image display
+  const baseUrl = import.meta.env.VITE_API_IMAGE_URL;//for image display
   
   return (
     <div className="min-h-screen bg-slate-50 p-6">
