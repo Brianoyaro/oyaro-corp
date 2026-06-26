@@ -1,34 +1,22 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState, useRef, useEffect, use } from 'react';
-import { FaShoppingCart, FaBars, FaTimes, FaSearch, FaBox, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { useState, useRef, useEffect } from 'react';
+import { FaShoppingCart, FaBars, FaTimes, FaBox, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { useCart } from '../hook/useCart';
 import { useAuth } from '../hook/useAuth';
-import { useQuery } from '@tanstack/react-query';
-import { useProducts } from '../hook/useProducts';
-import { useCategories } from '../hook/useCategory';
 import { useProfile } from '../hook/userProfileHook';
 
-
-export function  Navbar() {
+export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthMenuOpen, setIsAuthMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showSearchResults, setShowSearchResults] = useState(false);
-  const [showSearchModal, setShowSearchModal] = useState(false);
-  const searchRef = useRef(null);
   const authMenuRef = useRef(null);
-  const searchInputRef = useRef(null);
   const navigate = useNavigate();
-  
+
   const { getCartItemCount } = useCart();
   const cartCount = getCartItemCount() || 0;
   const location = useLocation();
   const { isAuthenticated, logout } = useAuth();
-  const { data: user, isLoading } = useProfile();
-  const isAdmin = user?.role?.toLowerCase().includes(("ADMIN").toLowerCase());
-
-  const { data: products = [] } = useProducts();
-  const { data: categories = [] } = useCategories();
+  const { data: user } = useProfile();
+  const isAdmin = user?.role?.toLowerCase().includes('ADMIN');
 
   const navItems = [
     { id: 'home', label: 'Home', path: '/' },
@@ -37,63 +25,12 @@ export function  Navbar() {
     { id: 'contact', label: 'Contact', path: '/contact' },
   ];
 
-
   const isActive = (path) => location.pathname === path;
 
-  // Close menu when a link is clicked
   const handleLinkClick = () => {
     setIsMenuOpen(false);
   };
 
-  // Get all products flattened
-  const allProducts = products || [];
-
-  // Search filtering logic
-  const searchResults =
-    searchQuery.trim().length > 0
-        ? allProducts.filter((product) => {
-            const query = searchQuery.toLowerCase();
-
-            return (
-            product.name?.toLowerCase().includes(query) ||
-            product.description?.toLowerCase().includes(query) ||
-            product.categoryName?.toLowerCase().includes(query)
-            );
-        })
-        : [];
-
-  // Close search results when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setShowSearchResults(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Focus search input when modal opens
-  useEffect(() => {
-    if (showSearchModal && searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
-  }, [showSearchModal]);
-
-  // Close search modal on Escape key
-  useEffect(() => {
-    const handleEscapeKey = (event) => {
-      if (event.key === 'Escape') {
-        setShowSearchModal(false);
-      }
-    };
-
-    document.addEventListener('keydown', handleEscapeKey);
-    return () => document.removeEventListener('keydown', handleEscapeKey);
-  }, []);
-
-  // Close auth menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (authMenuRef.current && !authMenuRef.current.contains(event.target)) {
@@ -109,23 +46,6 @@ export function  Navbar() {
     await logout();
     setIsAuthMenuOpen(false);
     navigate('/');
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery('');
-      setShowSearchResults(false);
-      setShowSearchModal(false);
-    }
-  };
-
-  const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`);
-    setSearchQuery('');
-    setShowSearchResults(false);
-    setShowSearchModal(false);
   };
 
   return (
@@ -160,19 +80,9 @@ export function  Navbar() {
             ))}
           </div>
 
-          {/* Right Section - Search, Cart & Menu Button */}
+          {/* Right Section - Cart & Menu Button */}
           <div className="flex items-center gap-3 md:gap-4">
-            {/* Search Icon */}
-            <button
-              onClick={() => setShowSearchModal(true)}
-              className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-              aria-label="Search"
-              title="Search products"
-            >
-              <FaSearch className="w-5 h-5 md:w-6 md:h-6" />
-            </button>
-
-              {/* Cart Icon with Badge */}
+            {/* Cart Icon with Badge */}
             {!isAdmin && (
             <Link
             to="/cart"
@@ -291,112 +201,6 @@ export function  Navbar() {
             </button>
           </div>
         </div>
-
-        {/* Search Modal - Overlay */}
-        {showSearchModal && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-start pt-20 justify-center" onClick={() => setShowSearchModal(false)}>
-            {/* Search Modal Container */}
-            <div 
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Search Input Section */}
-              <div className="p-4 md:p-6 border-b border-gray-200">
-                <form onSubmit={handleSearchSubmit} className="flex items-center gap-3">
-                  <FaSearch className="text-gray-400 text-lg flex-shrink-0" />
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder="Search products by name, type, or attributes..."
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      setShowSearchResults(e.target.value.length > 0);
-                    }}
-                    className="w-full px-2 py-2 outline-none text-gray-900 placeholder-gray-400 text-lg"
-                  />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSearchQuery('');
-                        setShowSearchResults(false);
-                        searchInputRef.current?.focus();
-                      }}
-                      className="text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </form>
-              </div>
-
-              {/* Search Results Section */}
-              <div className="max-h-96 overflow-y-auto">
-                {showSearchResults && searchQuery.trim().length > 0 ? (
-                  searchResults.length > 0 ? (
-                    <div>
-                      {/* Results Count */}
-                      <div className="px-4 md:px-6 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
-                        <p className="text-sm text-gray-600 font-medium">
-                          Found <span className="font-bold text-blue-600">{searchResults.length}</span> product{searchResults.length !== 1 ? 's' : ''}
-                        </p>
-                      </div>
-
-                      {/* Results List */}
-                      <div className="divide-y divide-gray-200">
-                        {searchResults.slice(0, 10).map(product => (
-                          <button
-                            key={product.id}
-                            onClick={() => handleProductClick(product.id)}
-                            className="w-full text-left px-4 md:px-6 py-3 hover:bg-blue-50 transition-colors duration-150 flex items-start gap-3"
-                          >
-                            <FaBox className="text-blue-600 mt-1 flex-shrink-0 text-sm" />
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-gray-900 truncate text-sm md:text-base">
-                                {product.name}
-                              </p>
-                              <div className="flex items-center justify-between mt-1">
-                                <p className="text-xs md:text-sm text-gray-500 truncate">
-                                  {product.type || product.categoryName}
-                                </p>
-                                <p className="text-sm font-bold text-blue-600 whitespace-nowrap ml-2">
-                                  KSH {product.price?.toFixed(2) || 'N/A'}
-                                </p>
-                              </div>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* View All Results */}
-                      {searchResults.length > 10 && (
-                        <button
-                          onClick={handleSearchSubmit}
-                          className="w-full px-4 md:px-6 py-3 text-blue-600 hover:bg-blue-50 font-medium text-sm transition-colors border-t border-gray-200"
-                        >
-                          View all {searchResults.length} results →
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="px-4 md:px-6 py-12 text-center">
-                      <FaBox className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-500 font-medium">No products found</p>
-                      <p className="text-gray-400 text-sm mt-1">Try searching for a different term</p>
-                    </div>
-                  )
-                ) : (
-                  <div className="px-4 md:px-6 py-12 text-center">
-                    <FaSearch className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500 font-medium">Start typing to search</p>
-                    <p className="text-gray-400 text-sm mt-1">Find products by name, type, or category</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Mobile Navigation Menu */}
         {isMenuOpen && (
