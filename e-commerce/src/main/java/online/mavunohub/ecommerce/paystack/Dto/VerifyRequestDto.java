@@ -1,0 +1,14 @@
+package online.mavunohub.ecommerce.paystack.Dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class VerifyRequestDto {
+    private String reference;
+}
