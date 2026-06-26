@@ -1,11 +1,12 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, use } from 'react';
 import { FaShoppingCart, FaBars, FaTimes, FaSearch, FaBox, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { useCart } from '../hook/useCart';
 import { useAuth } from '../hook/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { useProducts } from '../hook/useProducts';
 import { useCategories } from '../hook/useCategory';
+import { useProfile } from '../hook/userProfileHook';
 
 
 export function  Navbar() {
@@ -22,8 +23,9 @@ export function  Navbar() {
   const { getCartItemCount } = useCart();
   const cartCount = getCartItemCount() || 0;
   const location = useLocation();
-  const { user, isAuthenticated, logout } = useAuth();
-  const isAdmin = user?.roles?.includes("ROLE_ADMIN");
+  const { isAuthenticated, logout } = useAuth();
+  const { data: user, isLoading } = useProfile();
+  const isAdmin = user?.role?.toLowerCase().includes(("ADMIN").toLowerCase());
 
   const { data: products = [] } = useProducts();
   const { data: categories = [] } = useCategories();
@@ -34,6 +36,7 @@ export function  Navbar() {
     { id: 'about', label: 'About', path: '/about' },
     { id: 'contact', label: 'Contact', path: '/contact' },
   ];
+
 
   const isActive = (path) => location.pathname === path;
 
@@ -135,9 +138,6 @@ export function  Navbar() {
             to="/"
             className="flex items-center cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md">
-              N
-            </div>
             <span className="ml-2 text-lg md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
               MavunoHub
             </span>
@@ -172,10 +172,11 @@ export function  Navbar() {
               <FaSearch className="w-5 h-5 md:w-6 md:h-6" />
             </button>
 
-            {/* Cart Icon with Badge */}
+              {/* Cart Icon with Badge */}
+            {!isAdmin && (
             <Link
-              to="/cart"
-              className="relative p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+            to="/cart"
+            className="relative p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
             >
               <FaShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
               {cartCount > 0 && (
@@ -184,6 +185,7 @@ export function  Navbar() {
                 </span>
               )}
             </Link>
+            )}
 
             {/* Authentication Section */}
             <div className="hidden md:flex items-center gap-2 border-l border-gray-200 pl-3 md:pl-4">
@@ -241,7 +243,8 @@ export function  Navbar() {
                         <FaUser className="inline w-4 h-4 mr-2" />
                         My Profile
                       </Link>
-                      <Link
+                      { !isAdmin && (
+                        <Link
                         to="/orders"
                         onClick={() => setIsAuthMenuOpen(false)}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
@@ -249,6 +252,7 @@ export function  Navbar() {
                         <FaBox className="inline w-4 h-4 mr-2" />
                         My Orders
                       </Link>
+                      )}
                       <button
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-200"
@@ -455,14 +459,16 @@ export function  Navbar() {
                     <FaUser className="inline w-4 h-4 mr-2" />
                     My Profile
                   </Link>
-                  <Link
+                  {!isAdmin &&(
+                    <Link
                     to="/orders"
                     onClick={handleLinkClick}
                     className="block px-4 py-2.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
+                    >
                     <FaBox className="inline w-4 h-4 mr-2" />
                     My Orders
                   </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors mt-2"

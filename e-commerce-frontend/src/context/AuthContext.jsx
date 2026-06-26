@@ -1,5 +1,8 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
 import { authAPI } from '../api/authApi';
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
+
+
 
 /**
  * AuthContext
@@ -8,10 +11,12 @@ import { authAPI } from '../api/authApi';
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-//   const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const queryClient = useQueryClient()
 //   const [error, setError] = useState(null);
 
   /**
@@ -105,7 +110,7 @@ export function AuthProvider({ children }) {
       console.log('🚪 Logout event received from api interceptor');
       setAccessToken(null);
       setRefreshToken(null);
-    //   setUser(null);
+      setUser(null);
     };
 
     window.addEventListener('logout', handleLogoutEvent);
@@ -126,7 +131,8 @@ export function AuthProvider({ children }) {
 
       setAccessToken(null);
       setRefreshToken(null);
-    //   setUser(null);
+      queryClient.clear()
+      // setUser(null);
     //   setError(null);
 
       console.log('Logout complete');

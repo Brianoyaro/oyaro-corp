@@ -1,9 +1,14 @@
+import * as KenyaLocations from "kenya-locations";
+
+
 import { Link } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import { useCart } from "../hook/useCart";
+import { useState, useMemo } from "react";
 
 
 export default function CartView() {
+  const baseUrl = "http://localhost:8080"
   const {
     cart,
     updateCart,
@@ -17,8 +22,47 @@ export default function CartView() {
     currency: "KES",
   });
 
-  const baseUrl = "http://localhost:8080"
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [shippingAddress, setShippingAddress] = useState({
+    fullName: "",
+    phone: "",
+    county: "",
+    town: "",
+    street: "",
+  });
 
+   //memoized version
+  const counties = useMemo(() => KenyaLocations.counties, []);
+  const towns = useMemo(() => {
+    if (!shippingAddress.county) return [];
+
+    return KenyaLocations.getLocalitiesInCounty(shippingAddress.county);
+  }, [shippingAddress.county]);
+
+
+
+  const handleCheckout = () => {
+    alert("Payment coming soon.");
+    console.log({
+      shippingAddress,
+      total: getCartTotal(),
+      cart,
+    });
+    /**
+     * Save the shipping address to your backend.
+      Create an order.
+      Initialize the Paystack transaction.
+      Redirect the cust
+     */
+  };
+    
+  const getImageUrl =  (item) => {
+    const imgurl = item.imgUrl
+    if (imgurl.startsWith('/upload')) {
+      return `${baseUrl}${imgurl}`
+    }
+    return imgurl
+  }
   if (!cart.length) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
@@ -98,7 +142,7 @@ export default function CartView() {
               {/* Image */}
 
               <img
-                src={item.imgUrl}
+                src={getImageUrl(item)}
                 alt={item.productName}
                 className="
                   w-full
@@ -263,6 +307,7 @@ export default function CartView() {
             </div>
 
             <button
+              onClick={() => setShowCheckoutModal(true)}
               className="
                 w-full
                 mt-6
@@ -294,6 +339,157 @@ export default function CartView() {
           </div>
         </div>
       </div>
+
+      {showCheckoutModal && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+
+          <h2 className="text-2xl font-bold mb-1">
+            Shipping Address
+          </h2>
+
+          <p className="text-gray-500 mb-6">
+            Enter your delivery details.
+          </p>
+
+          <div className="space-y-4">
+
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={shippingAddress.fullName}
+              onChange={(e) =>
+                setShippingAddress({
+                  ...shippingAddress,
+                  fullName: e.target.value,
+                })
+              }
+              className="w-full border rounded-lg px-4 py-3"
+            />
+
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              value={shippingAddress.phone}
+              onChange={(e) =>
+                setShippingAddress({
+                  ...shippingAddress,
+                  phone: e.target.value,
+                })
+              }
+              className="w-full border rounded-lg px-4 py-3"
+            />
+
+            <div>
+            <label className="block text-sm font-medium mb-1">
+              County
+            </label>
+
+            <select
+              value={shippingAddress.county}
+              onChange={(e) =>
+                setShippingAddress({
+                  ...shippingAddress,
+                  county: e.target.value,
+                  town: "",
+                })
+              }
+              className="w-full border rounded-lg px-4 py-3"
+            >
+              <option value="">
+                Select County
+              </option>
+
+              {counties.map((county) => (
+                <option
+                  key={county.name}
+                  value={county.name}
+                >
+                  {county.name}
+                </option>
+              ))}
+            </select>
+          </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Town / City
+              </label>
+
+              <select
+                disabled={!shippingAddress.county}
+                value={shippingAddress.town}
+                onChange={(e) =>
+                  setShippingAddress({
+                    ...shippingAddress,
+                    town: e.target.value,
+                  })
+                }
+                className="w-full border rounded-lg px-4 py-3 disabled:bg-gray-100"
+              >
+                <option value="">
+                  {shippingAddress.county
+                    ? "Select Town"
+                    : "Select County First"}
+                </option>
+
+                {towns.map((town) => (
+                  <option
+                    key={town.name}
+                    value={town.name}
+                  >
+                    {town.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <textarea
+              rows={3}
+              placeholder="Street / Building / Apartment"
+              value={shippingAddress.street}
+              onChange={(e) =>
+                setShippingAddress({
+                  ...shippingAddress,
+                  street: e.target.value,
+                })
+              }
+              className="w-full border rounded-lg px-4 py-3 resize-none"
+            />
+          </div>
+
+          <div className="mt-6 border-t pt-4">
+
+            <div className="flex justify-between mb-6">
+              <span className="font-medium">Order Total</span>
+
+              <span className="font-bold text-blue-600">
+                {currencyFormatter.format(getCartTotal())}
+              </span>
+            </div>
+
+            <div className="flex gap-3">
+
+              <button
+                onClick={() => setShowCheckoutModal(false)}
+                className="flex-1 border border-gray-300 py-3 rounded-xl hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleCheckout}
+                className="flex-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700"
+              >
+                Pay Now
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    )}
     </div>
   );
 }
