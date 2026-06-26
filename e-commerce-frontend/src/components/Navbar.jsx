@@ -16,7 +16,9 @@ export function Navbar() {
   const location = useLocation();
   const { isAuthenticated, logout } = useAuth();
   const { data: user } = useProfile();
-  const isAdmin = user?.role?.toLowerCase().includes(('ADMIN').toLowerCase);
+  // const isAdmin = user?.role?.toLowerCase().includes(('ADMIN').toLowerCase);
+  const isAdmin = user?.role === 'ADMIN';
+  console.log(isAdmin)
 
   const navItems = [
     { id: 'home', label: 'Home', path: '/' },
