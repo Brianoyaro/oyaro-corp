@@ -145,7 +145,7 @@ export function Home() {
         <div className="absolute inset-0 flex items-center justify-center z-20">
           <div className="text-center text-white px-4 max-w-2xl">
             <h1 className="text-5xl md:text-6xl font-bold mb-4">
-              Welcome to Nthuli Shop
+              MavunoHub
             </h1>
             <p className="text-lg md:text-xl mb-8">
               Discover premium quality products for every lifestyle. Shop the latest fashion, accessories, and more.
