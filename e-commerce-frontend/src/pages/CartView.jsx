@@ -80,7 +80,7 @@ export default function CartView() {
       setLoadingPayment(true);
       //
     
-      const initializeResponse = paystackApi.initialize(
+      const initializeResponse = await paystackApi.initialize(
         {
           contactName: shippingAddress.fullName,
           contactPhone: shippingAddress.phone,
@@ -89,49 +89,15 @@ export default function CartView() {
           shippingTown: shippingAddress.town,
         });
 
-      /*const response = await fetch(
-        "http://localhost:8080/api/paystack/initialize",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            shippingAddress,
-            cart,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to initialize payment");
-      }
-
-      const payment = await response.json();*/
-
-      /**
-       * Backend should return:
-       *
-       * {
-       *   accessCode,
-       *   reference,
-       *   orderId
-       * }
-       */
-
       const popup = new PaystackPop();
 
       popup.resumeTransaction(initializeResponse.accessCode, {
+        
+        key:"pk_test_0a37ef52861a257521e0775d143888a7a9393b49", //store in .env
+
         onSuccess: async () => {
           try {
             const verify = await paystackApi.verify(initializeResponse.reference)
-            /*const verify = await fetch(
-              `http://localhost:8080/api/paystack/verify/${payment.reference}`,
-              {
-                method: "POST",
-              }
-            );*/
-
             if (verify.status !==  "success") {
               throw new Error("Verification failed");
             }

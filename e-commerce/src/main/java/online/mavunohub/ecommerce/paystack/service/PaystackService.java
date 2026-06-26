@@ -50,6 +50,7 @@ public class PaystackService {
      * -X POST
      */
     public PaystackResponseDto initializePaystack(User user, String shippingAddress) {
+        log.error("Initializing Paystack. Secret: {}, baseUrl: {}", secret, baseUrl);
         // create an order
         OrderResponseDto orderRsponse = orderService.createOrderFromCart(user, shippingAddress);
         Long orderId = orderRsponse.getId();

@@ -47,10 +47,10 @@ public class PaystackController {
     }
 
     @PostMapping("/verify/{reference}")
-    public ResponseEntity<?> verifyPaystack(@PathVariable String verifyRequest, @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> verifyPaystack(@PathVariable String reference, @AuthenticationPrincipal User user) {
         try {
             VerifyRequestDto verifyRequestDto = VerifyRequestDto.builder()
-                    .reference(verifyRequest)
+                    .reference(reference)
                     .build();
             VerifyResponseDto response = paystackService.verifyPaystack(verifyRequestDto, user);
             return ResponseEntity.status(HttpStatus.OK).body(response);
