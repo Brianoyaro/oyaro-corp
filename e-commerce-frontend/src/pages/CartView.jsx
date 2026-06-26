@@ -13,7 +13,7 @@ export default function CartView() {
   const navigate = useNavigate()
   const [loadingPayment, setLoadingPayment] = useState(false);
 
-  
+
   const baseUrl = "http://localhost:8080"
   const {
     cart,
@@ -47,19 +47,104 @@ export default function CartView() {
 
 
 
-  const handleCheckout = () => {
+  /**const handleCheckout = () => {
+   * 
     alert("Payment coming soon.");
     console.log({
       shippingAddress,
       total: getCartTotal(),
       cart,
     });
-    /**
-     * Save the shipping address to your backend.
-      Create an order.
-      Initialize the Paystack transaction.
-      Redirect the cust
-     */
+    
+      //Save the shipping address to your backend.
+      //Create an order.
+      //Initialize the Paystack transaction.
+      //Redirect the cust
+     
+  };*/
+
+  const handleCheckout = async () => {
+    if (
+      !shippingAddress.fullName ||
+      !shippingAddress.phone ||
+      !shippingAddress.county ||
+      !shippingAddress.town ||
+      !shippingAddress.street
+    ) {
+      alert("Please fill all shipping details.");
+      return;
+    }
+
+    try {
+      setLoadingPayment(true);
+
+      const response = await fetch(
+        "http://localhost:8080/api/paystack/initialize",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            shippingAddress,
+            cart,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to initialize payment");
+      }
+
+      const payment = await response.json();
+
+      /**
+       * Backend should return:
+       *
+       * {
+       *   accessCode,
+       *   reference,
+       *   orderId
+       * }
+       */
+
+      const popup = new PaystackPop();
+
+      popup.resumeTransaction(payment.accessCode, {
+        onSuccess: async () => {
+          try {
+            const verify = await fetch(
+              `http://localhost:8080/api/paystack/verify/${payment.reference}`,
+              {
+                method: "POST",
+              }
+            );
+
+            if (!verify.ok) {
+              throw new Error("Verification failed");
+            }
+
+            clearCart();
+
+            setShowCheckoutModal(false);
+
+            navigate(`/orders/${payment.orderId}`);
+          } catch (err) {
+            console.error(err);
+            alert("Payment verification failed.");
+          }
+        },
+
+        onCancel: () => {
+          console.log("Customer cancelled payment.");
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Unable to initialize payment.");
+    } finally {
+      setLoadingPayment(false);
+    }
   };
     
   const getImageUrl =  (item) => {
@@ -483,10 +568,12 @@ export default function CartView() {
               </button>
 
               <button
+                disabled={loadingPayment}
                 onClick={handleCheckout}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700"
+                className="flex-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed
+"
               >
-                Pay Now
+                {loadingPayment ? "Initializing..." : "Pay Now"}
               </button>
 
             </div>

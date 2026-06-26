@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import online.mavunohub.ecommerce.Authentication.model.User;
 import online.mavunohub.ecommerce.Cart.Dto.AddToCartRequestDto;
 import online.mavunohub.ecommerce.Cart.Dto.CartItemResponseDto;
+import online.mavunohub.ecommerce.Cart.Dto.UpdateCartRequestDto;
 import online.mavunohub.ecommerce.Cart.repository.CartItemRepo;
 import online.mavunohub.ecommerce.Cart.service.CartService;
 import org.springframework.http.HttpStatus;
@@ -124,6 +125,32 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (Exception e) {
             log.error("Error adding item cart", e);
+            Map<String, Object> response = new HashMap<>();
+            response.put("Message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @PutMapping("/update/{productId}")
+    public ResponseEntity<?> updateCartItem(
+            @PathVariable Long productId,
+            @AuthenticationPrincipal User user,
+            @RequestBody UpdateCartRequestDto request
+    ) {
+        try {
+            log.info("Updating cart item with ID: {}", productId);
+            if (request.getNewQuantity() == null || request.getNewQuantity() <= 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Quantity must be greater than 0");
+            }
+            CartItemResponseDto response = cartService.updateItemQuantity(user, productId, request);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (RuntimeException e) {
+            log.error("Product not found for ID: {}", productId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("Message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            log.error("Error updating cart item", e);
             Map<String, Object> response = new HashMap<>();
             response.put("Message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

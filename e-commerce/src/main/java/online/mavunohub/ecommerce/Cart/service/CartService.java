@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import online.mavunohub.ecommerce.Authentication.model.User;
 import online.mavunohub.ecommerce.Cart.Dto.AddToCartRequestDto;
 import online.mavunohub.ecommerce.Cart.Dto.CartItemResponseDto;
+import online.mavunohub.ecommerce.Cart.Dto.UpdateCartRequestDto;
 import online.mavunohub.ecommerce.Cart.model.Cart;
 import online.mavunohub.ecommerce.Cart.model.CartItem;
 import online.mavunohub.ecommerce.Cart.repository.CartItemRepo;
@@ -130,5 +131,27 @@ public class CartService {
                 .stream()
                 .map(this::mapper)
                 .collect(Collectors.toList());
+    }
+
+    public CartItemResponseDto updateItemQuantity(User user, Long productId, UpdateCartRequestDto request) {
+        try {
+            Cart cart = user.getCart();
+            List<CartItem> cartItems = cartItemRepo.findByCartId(cart.getId());
+            CartItem cartItem = null;
+            for (CartItem cartItem1 : cartItems) {
+                if (cartItem1.getProduct().getId().equals(productId)) {
+                    cartItem = cartItem1;
+                }
+            }
+            if (cartItem == null) {
+                throw new RuntimeException("Product with ID " + productId + " not found in user's cart");
+            }
+            cartItem.setQuantity(request.getNewQuantity());
+            cartItem = cartItemRepo.save(cartItem);
+            return mapper(cartItem);
+        } catch (Exception e) {
+            log.error("Error while updating cart for user {}", user.getId());
+            throw e;
+        }
     }
 }
