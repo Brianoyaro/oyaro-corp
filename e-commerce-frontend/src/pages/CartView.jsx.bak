@@ -1,19 +1,13 @@
 import * as KenyaLocations from "kenya-locations";
 
-import PaystackPop from "@paystack/inline-js";
 
-
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import { useCart } from "../hook/useCart";
 import { useState, useMemo } from "react";
 
 
 export default function CartView() {
-  const navigate = useNavigate()
-  const [loadingPayment, setLoadingPayment] = useState(false);
-
-  
   const baseUrl = "http://localhost:8080"
   const {
     cart,
