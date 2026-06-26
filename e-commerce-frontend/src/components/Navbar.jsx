@@ -16,7 +16,7 @@ export function Navbar() {
   const location = useLocation();
   const { isAuthenticated, logout } = useAuth();
   const { data: user } = useProfile();
-  const isAdmin = user?.role?.toLowerCase().includes('ADMIN');
+  const isAdmin = user?.role?.toLowerCase().includes(('ADMIN').toLowerCase);
 
   const navItems = [
     { id: 'home', label: 'Home', path: '/' },
@@ -54,14 +54,26 @@ export function Navbar() {
         {/* Main Navbar */}
         <div className="flex items-center justify-between py-3 md:py-4">
           {/* Logo */}
-          <Link
-            to="/"
+          {isAdmin && 
+            <Link
+            to="/admin-home"
             className="flex items-center cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
+          >
+            <span className="ml-2 text-lg md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+              Admin
+            </span>
+          </Link>
+          }
+          {!isAdmin &&
+          <Link
+          to="/"
+          className="flex items-center cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
           >
             <span className="ml-2 text-lg md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
               MavunoHub
             </span>
           </Link>
+          }
 
           {/* Desktop Navigation Links - Center */}
           <div className="hidden lg:flex items-center gap-8">

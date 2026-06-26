@@ -11,6 +11,11 @@ export  function AdminHome() {
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
 
   const baseUrl = import.meta.env.VITE_API_IMAGE_URL;//for image display
+
+  const currencyFormatter = new Intl.NumberFormat("en-KE", {
+    style: "currency",
+    currency: "KES",
+  });
   
   return (
     <div className="min-h-screen bg-slate-50 p-6">
@@ -148,7 +153,7 @@ export  function AdminHome() {
 
                             <div className="mt-3 flex justify-between items-center">
                               <span className="font-bold text-green-600">
-                                ${product.price}
+                                {currencyFormatter.format(product.price)}
                               </span>
 
                               <span
