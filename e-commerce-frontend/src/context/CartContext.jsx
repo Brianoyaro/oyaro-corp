@@ -9,7 +9,7 @@ export const CartContext = createContext();
 const STORAGE_KEY = 'cart';
 
 const transformBackEndCart = (item) => {
-    const API_IMAGE_BASE_URL = import.meta.env.VITE_API_IMAGE_BASE_URL || 'http://localhost:8080';
+    const API_IMAGE_BASE_URL = import.meta.env.VITE_API_IMAGE_URL || 'http://localhost:8080';
     const imgUrl = `${API_IMAGE_BASE_URL}${item.imageUrl}`
 
     return {
