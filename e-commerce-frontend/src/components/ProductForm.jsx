@@ -8,6 +8,8 @@ import { useCategory, useCategories } from "../hook/useCategory";
 import { useCreateProduct, useProduct, useUpdateProduct } from "../hook/useProducts";
 
 import { useWatch } from "react-hook-form";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const baseProductSchema = z.object({
   name: z.string().min(2),
@@ -62,7 +64,8 @@ export default function ProductForm({mode = "create", productId = null}) {
 
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const { mutate: createProduct } = useCreateProduct();
-  
+  const navigate = useNavigate()
+
   let product = null;
   let isLoading = false;
   if (mode === "edit" && productId) {
@@ -172,10 +175,12 @@ export default function ProductForm({mode = "create", productId = null}) {
     if (mode === "create") {
       try {
         createProduct(formData);
-        alert("Product created successfully");
+        toast.success("Product created successfully")
+        // alert("Product created successfully");
       } catch (err) {
         console.error(err);
-        alert("Failed to create product");
+        toast.error("Failed to create product")
+        // alert("Failed to create product");
       }
     } else if (mode === "edit") {
       let toKeep = existingImages.map((img) => (img.imgUrl ));
@@ -183,12 +188,15 @@ export default function ProductForm({mode = "create", productId = null}) {
       formData.append("imagesToKeep", new Blob([JSON.stringify(toKeep)], { type: "application/json" }));
       try {
         updateProduct({ id: productId, formData });
-        alert("Product updated successfully");
+        toast.success("Product updated successfully")
+        // alert("Product updated successfully");
       } catch (err) {
         console.error(err);
-        alert("Failed to update product");
+        toast.error("Failed to update product")
+        // alert("Failed to update product");
       }
     }
+    navigate("/admin-home")
   };
 
   return (

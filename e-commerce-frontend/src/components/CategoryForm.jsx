@@ -5,6 +5,8 @@ import { z } from "zod";
 import { useEffect } from "react";
 
 import { useCreateCategory, useUpdateCategory, useCategory } from "../hook/useCategory";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const categorySchema = z.object({
   categoryName: z
@@ -55,6 +57,8 @@ export default function CategoryForm({
   // const { mutate } = useCreateCategory();
   const createMutation = useCreateCategory();
   const updateMutation = useUpdateCategory();
+
+  const navigate = useNavigate()
 
   let categoryData = null;
   let isLoading = false;
@@ -110,9 +114,10 @@ export default function CategoryForm({
       if (mode === "create") {
         createMutation.mutate(payload, {
           onSuccess: () => {
-            alert(
-              "Category created successfully"
-            );
+            // alert(
+            //   "Category created successfully"
+            // );
+            toast.success("Category created successfully")
             reset();
           },
         });
@@ -124,16 +129,19 @@ export default function CategoryForm({
           },
           {
             onSuccess: () => {
-              alert(
-                "Category updated successfully"
-              );
+              // alert(
+              //   "Category updated successfully"
+              // );
+              toast.success("Category updated successfully")
             },
           }
         );
       }
+      navigate("/admin-home")
     } catch (error) {
       console.error(error);
-      alert('Failed to create category');
+      toast.error('Failed to create category')
+      // alert('Failed to create category');
     }
   };
 

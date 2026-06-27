@@ -4,6 +4,7 @@ import { Minus, Plus } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Thumbs } from "swiper/modules";
 import { useCart } from "../hook/useCart";
+import { toast } from "sonner";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -43,10 +44,12 @@ export default function ProductDetailView() {
         images: product.images,
         });
 
-        alert("Product added to cart");
+        toast.info("Product added to cart")
+        // alert("Product added to cart");
     } catch (error) {
         console.error("Failed to add item to cart", error);
-        alert("Failed to add item to cart");
+        toast.error("Failed to add item to cart")
+        // alert("Failed to add item to cart");
     }};
 
   const incrementQty = () => setQuantity((prev) => prev + 1);

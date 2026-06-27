@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'sonner';
 
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -49,7 +50,12 @@ function App() {
       <AuthProvider>
         <CartProvider>
             <Router>
-              <div className="min-h-screen bg-white flex-flex-col">
+              <Toaster
+              position='top-right'
+              richColors
+              closeButton
+              />
+              <div className="min-h-screen bg-white flex flex-col">
                 <Navbar />
                   <main className="flex-grow">
                     <Routes>

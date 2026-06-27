@@ -6,6 +6,8 @@ import { z } from 'zod';
 import { FaEnvelope, FaLock, FaSpinner, FaExclamationTriangle, FaCheckCircle } from 'react-icons/fa';
 import { useAuth } from '../../hook/useAuth';
 import { Button } from '../../components/Button';
+import { toast } from 'sonner';
+
 
 // Validation schema
 const signupSchema = z.object({
@@ -20,8 +22,6 @@ const signupSchema = z.object({
 export function Signup() {
   const navigate = useNavigate();
   const { signup, isLoading } = useAuth();
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   const {
     register,
@@ -38,25 +38,22 @@ export function Signup() {
 
   const onSubmit = async (data) => {
     try {
-      setError('');
-      setSuccess('');
 
       console.log('Attempting signup:', data.email);
       const result = await signup(data.email, data.password);
 
       if (result.success) {
         console.log('Signup and login successful, redirecting...');
-        setSuccess('Account created successfully! Redirecting to checkout...');
-        
+        toast.success("Successfully created a new account.")
         setTimeout(() => {
           navigate('/dashboard', {replace: true})
         }, 1500);
       } else {
-        setError(result.error || 'Signup failed');
+        toast.warning(result.error || 'Signup failed')
       }
     } catch (err) {
       console.error('Sgnup error:', err);
-      setError(err.message || 'An unexpected error occurred');
+      toast.error(err.message || 'An unexpected error occurred')
     }
   };
 
@@ -67,20 +64,6 @@ export function Signup() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
           <p className="text-gray-600">Join Mavuno Hub today</p>
         </div>
-
-        {success && (
-          <div className="mb-6 flex items-start gap-3 bg-green-50 border border-green-200 rounded-lg p-4">
-            {/* <FaCheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" /> */}
-            <p className="text-green-700 text-sm">{success}</p>
-          </div>
-        )}
-
-        {error && (
-          <div className="mb-6 flex items-start gap-3 bg-red-50 border border-red-200 rounded-lg p-4">
-            {/* <FaExclamationTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" /> */}
-            <p className="text-red-700 text-sm">{error}</p>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Email */}

@@ -1,5 +1,5 @@
 import * as KenyaLocations from "kenya-locations";
-
+import { toast } from "sonner";
 import PaystackPop from "@paystack/inline-js";
 import { paystackApi } from '../api/paystackApi';
 
@@ -75,7 +75,8 @@ export default function CartView() {
       !shippingAddress.town ||
       !shippingAddress.street
     ) {
-      alert("Please fill all shipping details.");
+      toast.warning("Please fill all shipping details.")
+      // alert("Please fill all shipping details.");
       return;
     }
 
@@ -108,27 +109,32 @@ export default function CartView() {
             clearCart();
 
             setShowCheckoutModal(false);
-            alert("Payment completed successfully.")
+            toast.success("Payment completed successfully.")
+            // alert("Payment completed successfully.")
             navigate(`/orders/${initializeResponse.orderId}`);
           } catch (err) {
             console.error(err);
-            alert("Payment verification failed.");
+            toast.error("Payment verification failed.")
+            // alert("Payment verification failed.");
           }
         },
 
         onCancel: () => {
           console.log("Customer cancelled payment.");
-          alert("Payment cancelled.");
+          toast.info("Customer cancelled payment.")
+          // alert("Payment cancelled.");
         },
 
         onError: (err) => {
           console.error(err);
-          alert("Unable to process payment.");
+          toast.error("Unable to process payment.")
+          // alert("Unable to process payment.");
         }
       });
     } catch (err) {
       console.error(err);
-      alert("Unable to initialize payment.");
+      toast.error("Unable to initialize payment.")
+      // alert("Unable to initialize payment.");
     } finally {
       setLoadingPayment(false);
     }

@@ -3,6 +3,7 @@ import { ShoppingBag, ArrowRight, ShoppingCart, Search } from "lucide-react";
 import { useCategories } from "../hook/useCategory";
 import { useMemo, useState } from "react";
 import { useCart } from "../hook/useCart";
+import { toast } from "sonner";
 
 
 export default function ProductListView() {
@@ -403,8 +404,10 @@ export default function ProductListView() {
                                             categoryName: category.name,
                                             images: product.images,
                                         });
+                                        toast.success(`${product.name} added to cart`)
                                         } catch (error) {
                                         console.error("Failed to add product to cart", error);
+                                        toast.error("Failed to add product to cart")
                                         }
                                     }}
                                     className="

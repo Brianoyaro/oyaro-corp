@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { FaEnvelope, FaLock, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
 import { useAuth } from '../../hook/useAuth';
 import { Button } from '../../components/Button';
+import { toast } from 'sonner';
 
 // Validation schema
 const loginSchema = z.object({
@@ -17,7 +18,6 @@ export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isLoading, isAuthenticated } = useAuth();
-  const [error, setError] = useState('');
 
   console.log(`isAuthenticated: ${isAuthenticated}, isLoading: ${isLoading}`)
   
@@ -44,30 +44,29 @@ export function Login() {
 
   const onSubmit = async (data) => {
     try {
-      setError('');
 
       console.log('Attempting login:', data.email);
       const result = await login(data.email, data.password);
-      // if (result.success) {
-      //   console.log('Login successful, redirecting...');
-      //   // Get redirect URL from query params or location state, default to home
-      //   const searchParams = new URLSearchParams(location.search);
-      //   const nextUrl = searchParams.get('next');
-      //   console.log(`next url: ${nextUrl}, location-object: ${location}`)
-        
-      //   if (nextUrl !== null) {
-      //       navigate(nextUrl, {replace: true});
-      //   } else {
-      //       navigate('/dashboard', {replace:true});
-      //   }
+      if (result.success) {
+        console.log('Login successful, redirecting...');
+        // Get redirect URL from query params or location state, default to home
+        const searchParams = new URLSearchParams(location.search);
+        const nextUrl = searchParams.get('next');
+        console.log(`next url: ${nextUrl}, location-object: ${location}`)
+        toast.success("Login completed successfully")
+        if (nextUrl !== null) {
+            navigate(nextUrl, {replace: true});
+        } else {
+            navigate('/dashboard', {replace:true});
+        }
         
 
-      // } else {
-      //   setError(result.error || 'Login failed');
-      // }
+      } else {
+        toast.warning(result.error || "Login failed")
+      }
     } catch (err) {
       console.error('Login error:', err);
-      setError(err.message || 'An unexpected error occurred');
+      toast.error("An unexpected error occurred. Try again")
     }
   };
 
@@ -79,12 +78,7 @@ export function Login() {
           <p className="text-gray-600">Sign in to your ccount</p>
         </div>
 
-        {error && (
-          <div className="mb-6 flex items-start gap-3 bg-red-50 border border-red-200 rounded-lg p-4">
-            {/* <FaExclamationTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" /> */}
-            <p className="text-red-700 text-sm">{error}</p>
-          </div>
-        )}
+       
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Email */}

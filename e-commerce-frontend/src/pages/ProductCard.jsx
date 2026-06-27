@@ -1,4 +1,5 @@
 import { useCart } from "../hook/useCart";
+import { toast } from "sonner";
 // import { useToast } from "../context/ToastContext";
 
 export function ProductCard({
@@ -34,10 +35,11 @@ export function ProductCard({
         categoryName: product.categoryName,
         images: product.images,
       });
-
+      toast.success(`${product.name} added to cart`);
     //   success(`${product.name} added to cart`);
     } catch (err) {
       console.error(err);
+      toast.error("Failed to add product to cart");
     //   error("Failed to add product to cart");
     }
   };

@@ -7,9 +7,9 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* About */}
           <div>
-            <h3 className="text-lg font-bold mb-4">About Nthuli</h3>
+            <h3 className="text-lg font-bold mb-4">About MavunoHub</h3>
             <p className="text-gray-400 text-sm">
-              Nthuli Shop is your one-stop destination for premium quality products.
+              MavunoHub Shop is your one-stop destination for premium quality products.
             </p>
           </div>
 
@@ -101,7 +101,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            &copy; 2024 Nthuli Shop. All rights reserved.
+            &copy; 2024 MavunoHub Shop. All rights reserved.
           </p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <a href="#" className="text-gray-400 hover:text-white transition-colors">
