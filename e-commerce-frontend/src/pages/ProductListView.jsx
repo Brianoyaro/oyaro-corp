@@ -11,7 +11,14 @@ export default function ProductListView() {
     const [searchTerm, setSearchTerm] = useState("");
     const { data: categoriesData, isLoading } = useCategories();
     const { addToCart, isLoading: cartLoading } = useCart();
-    
+    const [expandedCategories, setExpandedCategories] = useState({});
+    const toggleCategory = (categoryId) => {
+        setExpandedCategories((prev) => ({
+            ...prev,
+            [categoryId]: !prev[categoryId],
+        }));
+    };
+            
     const baseUrl = import.meta.env.VITE_API_IMAGE_URL;
 
     const getPrimaryImage = (images = []) => {
@@ -211,6 +218,16 @@ export default function ProductListView() {
                     {category.products?.length || 0} Products
                     </span>
                 </div>
+                {category.products.length > 8 && (
+                    <button
+                    onClick={() => toggleCategory(category.id)}
+                    className="text-blue-600 hover:underline"
+                    >
+                    {expandedCategories[category.id]
+                        ? "Show Less"
+                        : `View All (${category.products.length})`}
+                    </button>
+                )}
 
                 </div>
 
@@ -231,7 +248,10 @@ export default function ProductListView() {
                         scroll-smooth
                     "
                 >
-                    {category.products.slice(0, 8).map((product) => {
+                    {(expandedCategories[category.id]
+                    ? category.products
+                    : category.products.slice(0, 8)
+                    ).map((product) => {
                     const image =
                         getPrimaryImage(product.images);
 
@@ -423,28 +443,27 @@ export default function ProductListView() {
                 </div>
 
                 {/* View More Button */}
-                {category.products?.length > 8 && (
+                {/* {category.products?.length > 8 && (
                   <div className="flex justify-center mt-6 sm:mt-8">
-                    <Link
-                      to={`/category/${category.id}`}
-                      className="
-                        inline-block
-                        px-6 sm:px-8
-                        py-2.5 sm:py-3
-                        bg-blue-600
-                        text-white
-                        text-sm sm:text-base
-                        font-semibold
-                        rounded-xl
-                        hover:bg-blue-700
-                        active:bg-blue-800
-                        transition
-                      "
-                    >
-                      View More Products
-                    </Link>
+                    <button
+                        onClick={() => toggleCategory(category.id)}
+                        className="
+                            inline-block
+                            px-6
+                            py-3
+                            bg-blue-600
+                            text-white
+                            rounded-xl
+                            hover:bg-blue-700
+                            transition
+                        "
+                        >
+                        {expandedCategories[category.id]
+                            ? "Show Less"
+                            : `View All ${category.products.length} Products`}
+                    </button>
                   </div>
-                )}
+                )} */}
                 </>
                 ) : (
                 <div
