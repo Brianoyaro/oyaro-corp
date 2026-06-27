@@ -9,14 +9,13 @@ import { CartProvider } from './context/CartContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Dashboard } from './components/Dashboard';
 
-// import Navbar from './components/Navbar';
 import { Navbar } from './components/Navbar'
 import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
-// import { SearchResults } from './pages/SearchResults';
 
-
-
+import PaymentSuccess from './pages/PaymentSuccess';
+import Orders from './pages/OrdersList';
+import OrderDetail from './pages/OrderDetail';
 // Auth pages
 import { Login } from './pages/auth/Login';
 import { Signup } from './pages/auth/Signup';
@@ -74,9 +73,37 @@ function App() {
                       <Route path="/products" element={<ProductListView />} />
                       <Route path="/product/:id" element={<ProductDetailView />} />
                       <Route path="/cart" element={<CartView />} />
-                      {/* <Route path="/search" element={<SearchResults />} /> */}
 
-
+                      {/* <Route path="/payment-success" element={<PaymentSuccess />} />//protected
+                      <Route path="/orders" element={<Orders />} />//protected */}
+                      
+                      <Route
+                        path="/orders"
+                        element={
+                          <ProtectedRoute
+                          >
+                            <Orders />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/orders/:id"
+                        element={
+                          <ProtectedRoute
+                          >
+                            <OrderDetail />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/payment-success"
+                        element={
+                          <ProtectedRoute
+                          >
+                            <PaymentSuccess />
+                          </ProtectedRoute>
+                        }
+                      />
                       <Route
                         path="/admin-home"
                         element={

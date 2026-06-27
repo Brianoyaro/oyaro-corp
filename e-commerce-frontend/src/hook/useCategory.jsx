@@ -1,6 +1,5 @@
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { categoriesAPI } from '../api/categoriesApi';
-// import { id } from 'zod/v4/locales';
 
 
 export function useCategory(id) {

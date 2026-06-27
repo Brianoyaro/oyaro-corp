@@ -78,7 +78,8 @@ export default function CartView() {
             clearCart();
             setShowCheckoutModal(false);
             toast.success("Payment completed successfully.");
-            navigate("/dashboard");
+            // navigate("/dashboard");
+            navigate('/payment-success')
           } catch (err) {
             console.error(err);
             toast.error("Payment verification failed.");
