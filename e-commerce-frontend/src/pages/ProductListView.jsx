@@ -85,7 +85,7 @@ export default function ProductListView() {
                 <div key={item}>
                 <div className="h-6 sm:h-8 w-40 sm:w-56 bg-gray-200 rounded mb-4 sm:mb-6" />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
                     {[1, 2, 3, 4].map((card) => (
                     <div
                         key={card}
@@ -102,36 +102,6 @@ export default function ProductListView() {
 
     return (
         <div>
-
-        {/* HERO */}
-
-        {/* <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
-            <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-16">
-
-            <div className="max-w-3xl">
-                <h1 className="text-5xl font-bold">
-                Discover Amazing Products
-                </h1>
-
-                <p className="mt-4 text-lg text-blue-100">
-                Shop quality products at affordable prices.
-                </p>
-
-                <div className="mt-8 flex items-center gap-3">
-                <ShoppingBag size={22} />
-                <span>
-                    {categoriesData?.reduce(
-                    (sum, category) =>
-                        sum + (category.products?.length || 0),
-                    0
-                    )}{" "}
-                    Products Available
-                </span>
-                </div>
-            </div>
-
-            </div>
-        </section> */}
         <div className="max-w-7xl mx-auto px-2 xs:px-3 sm:px-4 lg:px-6 py-6 sm:py-8 md:py-10">
             {/* Search */}
             <div className="relative mb-5 sm:mb-6 md:mb-8">
@@ -250,12 +220,15 @@ export default function ProductListView() {
                 <>
                 <div
                     className="
-                        grid
-                        grid-cols-1
-                        sm:grid-cols-2
-                        lg:grid-cols-3
-                        xl:grid-cols-4
-                        gap-3 sm:gap-4 md:gap-6
+                        flex
+                        gap-4
+                        overflow-x-auto
+                        snap-x
+                        snap-mandatory
+                        px-1
+                        pb-2
+                        scrollbar-hide
+                        scroll-smooth
                     "
                 >
                     {category.products.slice(0, 8).map((product) => {
@@ -268,8 +241,10 @@ export default function ProductListView() {
                         to={`/product/${product.id}`}
                         className="
                             group
-                            // min-w-[280px]
-                            // lg:min-w-0
+                            min-w-[180px]
+                            max-w-[180px]
+                            sm:min-w-[220px]
+                            sm:max-w-[220px]
                             bg-white
                             rounded-2xl
                             overflow-hidden
@@ -282,8 +257,8 @@ export default function ProductListView() {
                             hover:-translate-y-1
                             flex
                             flex-col
-                            h-full
-                        "
+                            snap-start
+                            "
                         >
 
                         {/* IMAGE */}
@@ -298,7 +273,8 @@ export default function ProductListView() {
                                 alt={product.name}
                                 className="
                                     w-full
-                                    h-40 sm:h-48 md:h-56 lg:h-64
+                                    aspect-square
+                                    // h-28 sm:h-36 md:h-48 lg:h-56
                                     object-cover
                                     transition-transform
                                     duration-500
@@ -320,7 +296,7 @@ export default function ProductListView() {
 
                         {/* CONTENT */}
 
-                        <div className="p-3 sm:p-4 md:p-5 flex flex-col flex-1">
+                        <div className="p-3 smm:p-4 mmd:p-5 flex flex-col flex-1">
                             <Link to={`/product/${product.id}`}>
                                 <h3
                                 className="
@@ -336,6 +312,9 @@ export default function ProductListView() {
 
                             <p
                             className="
+                                hidden
+                                md:block
+
                                 mt-1 sm:mt-2
                                 text-xs sm:text-sm
                                 text-gray-500
@@ -348,7 +327,7 @@ export default function ProductListView() {
                             {/* Attributes */}
 
                             {product.attributes?.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3 sm:mt-4">
+                            <div className="hidden flex flex-wrap gap-1.5 sm:gap-2 mt-3 sm:mt-4">
                                 {product.attributes
                                 .slice(0, 2)
                                 .map((attribute) => (
@@ -421,7 +400,7 @@ export default function ProductListView() {
                                         whitespace-nowrap
                                         text-xs sm:text-sm md:text-base
                                         text-white
-                                        py-2 sm:py-2.5 md:py-3
+                                        py-2 smm:py-2.5 mmd:py-3
                                         rounded-lg sm:rounded-xl
                                         hover:bg-blue-700
                                         active:bg-blue-800

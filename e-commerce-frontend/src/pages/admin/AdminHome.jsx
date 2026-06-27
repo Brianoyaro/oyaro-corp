@@ -75,38 +75,55 @@ export  function AdminHome() {
                 "
               >
                 {/* Category Header */}
-                <div className="p-6 bg-slate-50">
-                  <h2 className="text-2xl font-bold text-slate-900">
-                    {category.name}
-                  </h2>
+                <div className="flex items-start justify-between p-6 bg-slate-50">
+                  <div>
+                      <h2 className="text-2xl font-bold">
+                          {category.name}
+                      </h2>
 
-                  <p className="text-slate-600 mt-1">
-                    {category.description}
-                  </p>
-
-                  <div className="mt-3 flex gap-4 text-sm text-slate-500">
-                    <span>
-                      {category.products?.length || 0} Products
-                    </span>
-
-                    <span>
-                      {category.attributes?.length || 0} Attributes
-                    </span>
+                      <p className="text-sm text-slate-500 mt-1">
+                          {category.products.length} Products • {category.attributes.length} Attributes
+                      </p>
                   </div>
-                </div>
-                <div className="border-t border-slate-200 p-6 flex gap-4">
+
                   <button
-                    onClick={() => navigate(`/edit-category/${category.id}`)}
-                    className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+                      onClick={() => navigate(`/edit-category/${category.id}`)}
+                      className="rounded-lg bg-yellow-500 px-4 py-2 text-white"
                   >
-                    Edit Category
+                      Edit Category
                   </button>
-                </div>
+              </div>
 
                 {/* Products */}
                 <div className="p-6">
                   {category.products?.length > 0 ? (
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div
+                      className="
+                          flex
+                          gap-4
+                          overflow-x-auto
+                          snap-x
+                          snap-mandatory
+                          scrollbar-hide
+                          scroll-smooth
+                          pb-2
+                      "
+                      // className="
+                      //   group
+                      //   min-w-[200px]
+                      //   max-w-[200px]
+                      //   bg-white
+                      //   rounded-xl
+                      //   border
+                      //   border-slate-200
+                      //   overflow-hidden
+                      //   transition-all
+                      //   duration-300
+                      //   hover:-translate-y-1
+                      //   hover:shadow-xl
+                      //   snap-start
+                      //   "
+                  >
                       {category.products.slice(0, 6).map((product) => (
 
                         <Link
@@ -115,6 +132,9 @@ export  function AdminHome() {
                           key={product.id}
                           className="
                             group
+                            min-w-[200px]
+                            max-w-[200px]
+                            flex-shrink-0
                             bg-white
                             rounded-xl
                             border
@@ -125,6 +145,7 @@ export  function AdminHome() {
                             hover:-translate-y-1
                             hover:shadow-xl
                             hover:border-blue-180
+                            snap-start
                           "
                         >
                           {/* Product Image */}
@@ -133,7 +154,7 @@ export  function AdminHome() {
                             alt={product.name}
                             className="
                               w-full
-                              h-48
+                              aspect-square
                               object-cover
                               transition-transform
                               duration-500
@@ -150,13 +171,16 @@ export  function AdminHome() {
                             <p className="text-sm text-slate-500 mt-1 line-clamp-2">
                               {product.description}
                             </p>
+                            <div className="mt-2 text-xs text-slate-500">
+                                {product.images.length} Images
+                            </div>
 
                             <div className="mt-3 flex justify-between items-center">
                               <span className="font-bold text-green-600">
                                 {currencyFormatter.format(product.price)}
                               </span>
 
-                              <span
+                              {/* <span
                                 className="
                                   text-blue-600
                                   opacity-0
@@ -165,7 +189,12 @@ export  function AdminHome() {
                                 "
                               >
                                 View →
-                              </span>
+                              </span> */}
+                              <div className="mt-4">
+                                  <div className="w-full rounded-lg bg-blue-600 px-2 py-2 text-center text-sm font-medium text-white group-hover:bg-blue-700">
+                                      Edit
+                                  </div>
+                              </div>
                             </div>
 
                             {/* Attributes */}
