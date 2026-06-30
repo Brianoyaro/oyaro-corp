@@ -114,13 +114,6 @@ export function Login() {
                 <Lock className="w-4 h-4" />
                 Password
               </label>
-
-              <Link
-                to="/forgot-password"
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
-              >
-                Forgot?
-              </Link>
             </div>
 
             <div className="relative">

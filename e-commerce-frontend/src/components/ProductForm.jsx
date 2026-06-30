@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { FiPlus, FiTrash2, FiImage } from "react-icons/fi";
+import { Image } from "lucide-react";
 import { z } from "zod";
 import { useCategory, useCategories } from "../hook/useCategory";
 import { useCreateProduct, useProduct, useUpdateProduct } from "../hook/useProducts";
@@ -244,7 +244,7 @@ export default function ProductForm({mode = "create", productId = null}) {
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <FiImage className="text-slate-600" />
+                  <Image className="text-slate-600" />
                   <h3 className="font-semibold text-slate-800">Images</h3>
                 </div>
               </div>

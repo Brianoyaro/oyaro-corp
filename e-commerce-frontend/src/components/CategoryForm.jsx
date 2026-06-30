@@ -1,6 +1,6 @@
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FiPlus, FiTrash2, FiTag } from "react-icons/fi";
+import { Plus, Trash2, Tag } from "lucide-react";
 import { z } from "zod";
 import { useEffect } from "react";
 
@@ -212,7 +212,7 @@ export default function CategoryForm({
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <FiTag className="text-slate-600" />
+                  <Tag className="text-slate-600" />
                   <h3 className="font-semibold text-slate-800">
                     Attributes
                   </h3>
@@ -225,7 +225,7 @@ export default function CategoryForm({
                   }
                   className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
                 >
-                  <FiPlus />
+                  <Plus />
                   Add Attribute
                 </button>
               </div>
@@ -256,7 +256,7 @@ export default function CategoryForm({
                             }
                             className="rounded-lg bg-red-100 p-3 text-red-600 hover:bg-red-200"
                           >
-                            <FiTrash2 />
+                            <Trash2 />
                           </button>
                         )}
                       </div>
