@@ -2,15 +2,29 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../hook/useAuth";
-import { useCategory, useCategories } from "../../hook/useCategory";
+import { useDeleteCategory, useCategory, useCategories } from "../../hook/useCategory";
+import { toast } from "sonner";
 
 
 export  function AdminHome() {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
+  const deleteCategoryMutation = useDeleteCategory();
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   const baseUrl = import.meta.env.VITE_API_IMAGE_URL;//for image display
+
+  const confirmDeleteCategory = async () => {
+    if (!categoryToDelete) return;
+    try {
+      await deleteCategoryMutation.mutateAsync(categoryToDelete.id);
+      toast.success("Category deleted successfully");
+      setCategoryToDelete(null);
+    } catch (error) {
+      toast.error("Failed to delete category");
+    }
+  };
 
   const currencyFormatter = new Intl.NumberFormat("en-KE", {
     style: "currency",
@@ -86,12 +100,27 @@ export  function AdminHome() {
                       </p>
                   </div>
 
-                  <button
+                  {/* <button
                       onClick={() => navigate(`/edit-category/${category.id}`)}
                       className="rounded-lg bg-yellow-500 px-4 py-2 text-white"
                   >
                       Edit Category
-                  </button>
+                  </button> */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => navigate(`/edit-category/${category.id}`)}
+                      className="rounded-lg bg-yellow-500 px-4 py-2 text-white hover:bg-yellow-600"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => setCategoryToDelete(category)}
+                      className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                    >
+                      Delete
+                    </button>
+                  </div>
               </div>
 
                 {/* Products */}
@@ -231,6 +260,56 @@ export  function AdminHome() {
         )}
 
       </div>
+        {categoryToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-xl">
+
+            <div className="border-b px-6 py-4">
+              <h2 className="text-xl font-bold text-slate-900">
+                Delete Category
+              </h2>
+            </div>
+
+            <div className="px-6 py-5">
+              <p className="text-slate-600">
+                Are you sure you want to delete
+                <span className="font-semibold">
+                  {" "}
+                  "{categoryToDelete.name}"
+                </span>
+                ?
+              </p>
+
+              <p className="mt-3 text-sm text-red-600">
+                This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-3 border-t px-6 py-4">
+
+              <button
+                onClick={() => setCategoryToDelete(null)}
+                disabled={deleteCategoryMutation.isPending}
+                className="rounded-lg border border-slate-300 px-5 py-2 hover:bg-slate-100"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={confirmDeleteCategory}
+                disabled={deleteCategoryMutation.isPending}
+                className="rounded-lg bg-red-600 px-5 py-2 text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleteCategoryMutation.isPending
+                  ? "Deleting..."
+                  : "Delete"}
+              </button>
+
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

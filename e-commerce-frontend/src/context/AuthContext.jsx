@@ -45,11 +45,9 @@ export function AuthProvider({ children }) {
       setIsLoading(true);
 
       const response = await authAPI.register(email, password);
-      console.log('Signup successful:', response);
 
       // Automatically log in after signup
       const loginResponse = await authAPI.login(email, password);
-      console.log('Auto-login after signup:', loginResponse);
 
       // Save tokens and user
       localStorage.setItem('accessToken', loginResponse.accessToken);
@@ -64,7 +62,6 @@ export function AuthProvider({ children }) {
     } catch (err) {
       const errorMessage = err.message || 'Signup failed';
     //   setError(errorMessage);
-      console.error('Signup error:', err);
       return { success: false, error: errorMessage };
     } finally {
       setIsLoading(false);
@@ -80,7 +77,6 @@ export function AuthProvider({ children }) {
       setIsLoading(true);
 
       const response = await authAPI.login(email, password);
-      console.log('Login successful:', response);
 
       // Save tokens and user
       localStorage.setItem('accessToken', response.accessToken);
@@ -95,7 +91,6 @@ export function AuthProvider({ children }) {
     } catch (err) {
       const errorMessage = err.message || 'Login failed';
     //   setError(errorMessage);
-      console.error('Login error:', err);
       return { success: false, error: errorMessage };
     } finally {
       setIsLoading(false);
@@ -107,7 +102,6 @@ export function AuthProvider({ children }) {
    */
   useEffect(() => {
     const handleLogoutEvent = () => {
-      console.log('🚪 Logout event received from api interceptor');
       setAccessToken(null);
       setRefreshToken(null);
       setUser(null);
@@ -122,7 +116,6 @@ export function AuthProvider({ children }) {
    */
   const logout = useCallback(async () => {
     try {
-      console.log('Logging out...');
 
       // Clear tokens
       localStorage.removeItem('accessToken');
@@ -135,10 +128,8 @@ export function AuthProvider({ children }) {
       // setUser(null);
     //   setError(null);
 
-      console.log('Logout complete');
       return { success: true };
     } catch (err) {
-      console.error('Logout error:', err);
       return { success: false, error: err.message };
     }
   }, []);

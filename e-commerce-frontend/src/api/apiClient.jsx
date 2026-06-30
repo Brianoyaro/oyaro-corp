@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
-console.log('🔧 API Base URL:', API_BASE_URL);
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -34,14 +33,11 @@ apiClient.interceptors.request.use(
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
-      console.log(`🔐 Added auth token to request: ${config.method.toUpperCase()} ${config.url}`);
     }
 
-    console.log(`🔵 API Request: ${config.method.toUpperCase()} ${config.baseURL}${config.url}`, config.data);
     return config;
   },
   error => {
-    console.error('Request Error:', error);
     return Promise.reject(error);
   }
 );
@@ -49,7 +45,6 @@ apiClient.interceptors.request.use(
 // Add response interceptor to handle token refresh on 401 or 403 (expired token)
 apiClient.interceptors.response.use(
   response => {
-    console.log(`🟢 API Response: ${response.status} ${response.config.url}`, response.data);
     return response;
   },
   error => {
@@ -76,7 +71,6 @@ apiClient.interceptors.response.use(
         const refreshToken = localStorage.getItem('refreshToken');
 
         if (!refreshToken) {
-          console.error('❌ No refresh token available. Token is:', error.response?.status === 403 ? 'EXPIRED' : 'UNAUTHORIZED');
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('user');
@@ -87,14 +81,12 @@ apiClient.interceptors.response.use(
           return;
         }
 
-        console.log('🔄 Attempting to refresh token...');
 
         axios
           .post(`${API_BASE_URL}/auth/refresh-token`, { token: refreshToken })
           .then(response => {
             const { accessToken, refreshToken: newRefreshToken } = response.data;
 
-            console.log('✅ Token refreshed successfully');
 
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', newRefreshToken);
@@ -106,7 +98,6 @@ apiClient.interceptors.response.use(
             resolve(apiClient(originalRequest));
           })
           .catch(err => {
-      console.error('❌ Token refresh failed:', err);
             processQueue(err, null);
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
@@ -122,7 +113,6 @@ apiClient.interceptors.response.use(
       });
     }
 
-    console.error('❌ API Error:', error.response?.status, error.response?.data || error.message);
     return Promise.reject(error);
   }
 );

@@ -25,6 +25,13 @@ export function Home() {
     kitchenImage,
   ];
 
+  const carouselAltText = [
+    'Collection of premium shoes',
+    'Stylish clothing collection',
+    'Modern furniture selection',
+    'Kitchen appliances featured in the latest range',
+  ];
+
   // Auto-rotate carousel images every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
@@ -60,106 +67,101 @@ export function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center" role="status" aria-live="polite">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">Loading featured products...</p>
         </div>
-      </div>
+      </main>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center" role="alert">
         <div className="text-center">
           <p className="text-red-600 mb-4">Failed to load products</p>
           <button
+            type="button"
             onClick={() => window.location.reload()}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
             Retry
           </button>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="relative w-full h-screen overflow-hidden">
-        {/* Full-Screen Carousel */}
+      <section className="relative w-full h-screen overflow-hidden" aria-label="Featured products carousel">
         <div className="relative w-full h-full bg-gray-200">
-              {/* Carousel Images */}
-              {carouselImages.map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`Hero carousel ${index + 1}`}
-                  className={`absolute w-full h-full object-cover transition-opacity duration-1000 ${
-                    index === currentImageIndex ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
-              ))}
+          {carouselImages.map((image, index) => (
+            <img
+              key={index}
+              src={image}
+              alt={carouselAltText[index]}
+              className={`absolute w-full h-full object-cover transition-opacity duration-1000 ${
+                index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          ))}
 
-              {/* Previous Button */}
+          <button
+            type="button"
+            onClick={() =>
+              setCurrentImageIndex(
+                (prev) => (prev - 1 + carouselImages.length) % carouselImages.length
+              )
+            }
+            aria-label="Show previous featured item"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-gray-900 rounded-full p-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+          >
+            ←
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length)}
+            aria-label="Show next featured item"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-gray-900 rounded-full p-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+          >
+            →
+          </button>
+
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2" aria-label="Carousel navigation">
+            {carouselImages.map((_, index) => (
               <button
-                onClick={() =>
-                  setCurrentImageIndex(
-                    (prev) => (prev - 1 + carouselImages.length) % carouselImages.length
-                  )
-                }
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 text-gray-900 rounded-full p-2 transition-all"
-              >
-                ←
-              </button>
-
-              {/* Next Button */}
-              <button
-                onClick={() =>
-                  setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length)
-                }
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-80 hover:bg-opacity-100 text-gray-900 rounded-full p-2 transition-all"
-              >
-                →
-              </button>
-
-              {/* Carousel Indicators */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
-                {carouselImages.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      index === currentImageIndex
-                        ? 'bg-white w-8'
-                        : 'bg-white bg-opacity-50 hover:bg-opacity-75'
-                    }`}
-                  />
-                ))}
-              </div>
+                key={index}
+                type="button"
+                onClick={() => setCurrentImageIndex(index)}
+                aria-label={`Go to slide ${index + 1}`}
+                aria-current={index === currentImageIndex ? 'true' : undefined}
+                className={`w-2 h-2 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 ${
+                  index === currentImageIndex ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
+                }`}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Text Overlay */}
         <div className="absolute inset-0 flex items-center justify-center z-20">
           <div className="text-center text-white px-4 max-w-2xl">
-            <h1 className="text-5xl md:text-6xl font-bold mb-4">
-              MavunoHub
-            </h1>
+            <h1 className="text-5xl md:text-6xl font-bold mb-4">MavunoHub</h1>
             <p className="text-lg md:text-xl mb-8">
               Discover premium quality products for every lifestyle. Shop the latest fashion, accessories, and more.
             </p>
             <button
+              type="button"
               onClick={() => navigate('/products')}
-              className="bg-white text-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-blue-50 transition-colors"
+              className="bg-white text-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-blue-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
             >
               Shop Now
             </button>
           </div>
         </div>
       </section>
-
     </div>
   );
 }

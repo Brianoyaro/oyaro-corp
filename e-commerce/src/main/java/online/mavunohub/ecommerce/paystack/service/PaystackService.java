@@ -19,10 +19,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -39,7 +42,7 @@ public class PaystackService {
     @Value("${paystack.base-url}")
     private String baseUrl;
 
-    // initialize
+    // initiate a transaction
     /**
      * curl https://api.paystack.co/transaction/initialize
      * -H "Authorization: Bearer YOUR_SECRET_KEY"
@@ -49,64 +52,86 @@ public class PaystackService {
      *     }'
      * -X POST
      */
-    public PaystackResponseDto initializePaystack(User user, String shippingAddress) {
-        log.error("Initializing Paystack. Secret: {}, baseUrl: {}", secret, baseUrl);
-        // create an order
-        OrderResponseDto orderRsponse = orderService.createOrderFromCart(user, shippingAddress);
-        Long orderId = orderRsponse.getId();
-        Order order = orderRepo.findById(orderId).orElseThrow();
-
+    public PaystackResponseDto initializePaystack(User user, String shippingAddress, String phone) {
+        log.error("PAYSTACK INITIALIZATION STARTED. Secret: {}", secret);
         // create a reference
         String reference = UUID.randomUUID().toString();
+        LocalDateTime cutoff =
+                LocalDateTime.now().minusMinutes(30);
 
-        // crate a pending payment
-        BigDecimal amount = order.getTotalAmount();
+        // idempotency
+        Paystack existingOrNew = null;
+        Optional<Paystack> existing =
+                paystackRepo.findFirstByEmailAndStatusAndCreatedAtAfterOrderByCreatedAtDesc(
+                        user.getEmail(),
+                        PaystackStatus.PENDING,
+                        cutoff
+                );
+        if (existing.isPresent()) {
+            existingOrNew = existing.get();
+            existingOrNew.setReference(reference);
+        }
+        if  (existing.isEmpty()) {
+           // create a new transaction if no such transaction exists
+            // create an order
+            OrderResponseDto orderResponse = orderService.createOrderFromCart(user, shippingAddress);
+            Long orderId = orderResponse.getId();
+            Order order = orderRepo.findById(orderId).orElseThrow();
 
-        Paystack paystack = Paystack.builder()
-                .reference(reference)
-                .order(order)
-                .amount(amount)
-                .email(user.getEmail())
-                .build();
-        paystackRepo.save(paystack);
+            // crate a pending payment
+            BigDecimal amount = order.getTotalAmount();
 
-        /**
-         * call /transactions/initialize endpoint
-         */
+            existingOrNew = Paystack.builder()
+                    .reference(reference)
+                    .order(order)
+                    .amount(amount)
+                    .email(user.getEmail())
+                    .currency("KES")
+                    .customerPhone(phone)
+                    .build();
+        }
+
+        // call /transactions/initialize endpoint
         Map<String, Object> payload = new HashMap<>();
         payload.put("email", user.getEmail());
         // Paystack uses smallest currency unit
         payload.put(
                 "amount",
-                amount.multiply(BigDecimal.valueOf(100)).intValue()
+                existingOrNew.getAmount().multiply(BigDecimal.valueOf(100)).intValue()
         );
         payload.put("currency", "KES");
-        payload.put("reference", reference);
-        //payload.put("callback_url", "http://localhost:3000/payment/success");
-        Map response =
-                webClient.post()
-                        .uri(baseUrl + "/transaction/initialize")
-                        .header("Authorization", "Bearer " + secret)
-                        .bodyValue(payload)
-                        .retrieve()
-                        .bodyToMono(Map.class)
-                        .block();
+        payload.put("reference", existingOrNew.getReference());
+        try {
+            Map response =
+                    webClient.post()
+                            .uri(baseUrl + "/transaction/initialize")
+                            .header("Authorization", "Bearer " + secret)
+                            .bodyValue(payload)
+                            .retrieve()
+                            .bodyToMono(Map.class)
+                            .block();
 
-        Map data = (Map) response.get("data");
-        String authorizationUrl = data.get("authorization_url").toString();
-        String accessCode = data.get("access_code").toString();
-        String referenceCode = data.get("reference").toString();
+            Map data = (Map) response.get("data");
+            String authorizationUrl = data.get("authorization_url").toString();
+            String accessCode = data.get("access_code").toString();
+            String referenceCode = data.get("reference").toString();
+            existingOrNew.setAccessCode(accessCode);
+            paystackRepo.save(existingOrNew);
 
-
-        return PaystackResponseDto.builder()
-                .accessCode(accessCode)
-                .reference(referenceCode)
-                .authorizationUrl(authorizationUrl)
-                .orderId(orderId)
-                .build();
+            return PaystackResponseDto.builder()
+                    .accessCode(accessCode)
+                    .reference(referenceCode)
+                    .authorizationUrl(authorizationUrl)
+                    .orderId(existingOrNew.getOrder().getId())
+                    .build();
+        } catch (WebClientResponseException e) {
+            log.error("Status: {}", e.getStatusCode());
+            log.error("Body: {}", e.getResponseBodyAsString());
+            throw e;
+        }
     }
 
-    // verify
+    // verify customer transaction
     /**
      * curl https://api.paystack.co/transaction/verify/:reference
      * -H "Authorization: Bearer YOUR_SECRET_KEY"
@@ -117,6 +142,13 @@ public class PaystackService {
     public VerifyResponseDto verifyPaystack(VerifyRequestDto request, User user) {
         //
         String reference = request.getReference();
+
+        // idempotency check
+        Paystack paystackPayment = paystackRepo.findByReference(reference).orElseThrow();
+        if (paystackPayment.getStatus() == PaystackStatus.SUCCESS) {
+            throw new RuntimeException("Payment already completed");
+        }
+
         Map response =
                 webClient.get()
                         .uri(baseUrl + "/transaction/verify/{reference}", reference)
@@ -124,32 +156,49 @@ public class PaystackService {
                         .retrieve()
                         .bodyToMono(Map.class)
                         .block();
+
+        // catch other errors before accessing data
+        Boolean success = (Boolean) response.get("status");
+        if (!Boolean.TRUE.equals(success)) {
+            throw new RuntimeException(
+                    (String) response.get("message")
+            );
+        }
+
         Map data = (Map) response.get("data");
         String status = (String) data.get("status");
         String receiptNumber = (String) data.get("receipt_number");
         String referenceCode = (String) data.get("reference");
         Number amount = (Number) data.get("amount");
+        String currency = (String) data.get("currency");
         BigDecimal actualAmount =
                 BigDecimal.valueOf(amount.longValue())
                         .divide(BigDecimal.valueOf(100));
 
-        Paystack payment = paystackRepo.findByReference(reference).orElseThrow();
+//        Paystack payment = paystackRepo.findByReference(reference).orElseThrow();
 
-        if (!payment.getEmail().equals(user.getEmail())) {
+        if (!paystackPayment.getEmail().equals(user.getEmail())) {
             throw new RuntimeException("Unauthorized");
         }
 
-        BigDecimal expected = payment.getAmount();
+        if (!paystackPayment.getCurrency().equals(currency)) {
+            throw new RuntimeException("Invalid currency");
+        }
+        BigDecimal expected = paystackPayment.getAmount();
         if (expected.compareTo(actualAmount) != 0) {
             throw new RuntimeException("Payment amount mismatch.");
         }
 
         if (status.equalsIgnoreCase("success")) {
-            payment.setStatus(PaystackStatus.SUCCESS);
+            paystackPayment.setStatus(PaystackStatus.SUCCESS);
             // change order status
-            payment.getOrder().setOrderStatus(OrderStatus.CONFIRMED);
+            paystackPayment.getOrder().setOrderStatus(OrderStatus.CONFIRMED);
+        } else {
+            paystackPayment.setStatus(PaystackStatus.FAILED);
         }
-        paystackRepo.save(payment);
+        paystackPayment.setVerifiedAt(LocalDateTime.now());
+        paystackPayment.setReceiptNumber(receiptNumber);
+        paystackRepo.save(paystackPayment);
 
 
         return VerifyResponseDto.builder()

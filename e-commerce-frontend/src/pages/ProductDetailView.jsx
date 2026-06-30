@@ -5,316 +5,217 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Thumbs } from "swiper/modules";
 import { useCart } from "../hook/useCart";
 import { toast } from "sonner";
+import { useProduct } from "../hook/useProducts";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
 
-import { useProduct } from "../hook/useProducts";
-
 export default function ProductDetailView() {
   const { id } = useParams();
   const { data: product, isLoading } = useProduct(id);
-  const { addToCart, isLoading:cartLoading } = useCart();
-
+  const { addToCart, isLoading: cartLoading } = useCart();
 
   const baseUrl = import.meta.env.VITE_API_IMAGE_URL;
-  console.log(baseUrl)
 
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
   const images = useMemo(() => {
     if (!product?.images) return [];
-
     const primary = product.images.find((img) => img.isPrimary);
     const others = product.images.filter((img) => !img.isPrimary);
-
     return primary ? [primary, ...others] : product.images;
   }, [product]);
 
   const handleAddToCart = async () => {
     try {
-        await addToCart({
+      await addToCart({
         id: product.id,
         name: product.name,
         price: product.price,
         quantity,
         categoryName: product.category?.name,
         images: product.images,
-        });
+      });
 
-        toast.info("Product added to cart")
-        // alert("Product added to cart");
+      toast.info("Product added to cart");
     } catch (error) {
-        console.error("Failed to add item to cart", error);
-        toast.error("Failed to add item to cart")
-        // alert("Failed to add item to cart");
-    }};
-
-  const incrementQty = () => setQuantity((prev) => prev + 1);
-
-  const decrementQty = () => {
-    if (quantity > 1) {
-      setQuantity((prev) => prev - 1);
+      toast.error("Failed to add item to cart");
     }
   };
+
+  const incrementQty = () => setQuantity((p) => p + 1);
+
+  const decrementQty = () => {
+    if (quantity > 1) setQuantity((p) => p - 1);
+  };
+
   const currencyFormatter = new Intl.NumberFormat("en-KE", {
     style: "currency",
     currency: "KES",
-    });
+  });
 
   if (isLoading) {
     return (
-      <div className="max-w-7xl mx-auto p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
-        <div className="animate-pulse grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          <div className="h-64 sm:h-80 md:h-96 lg:h-[500px] bg-gray-200 rounded-xl"></div>
-
-          <div className="space-y-3 sm:space-y-4">
-            <div className="h-8 sm:h-10 bg-gray-200 rounded"></div>
-            <div className="h-6 sm:h-7 bg-gray-200 rounded w-1/3"></div>
-            <div className="h-32 sm:h-40 bg-gray-200 rounded"></div>
+      <main aria-busy="true" aria-live="polite" className="max-w-7xl mx-auto p-6">
+        <p className="sr-only">Loading product details</p>
+        <div className="animate-pulse grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="h-96 bg-gray-200 rounded-xl" />
+          <div className="space-y-4">
+            <div className="h-10 bg-gray-200 rounded" />
+            <div className="h-6 bg-gray-200 rounded w-1/3" />
+            <div className="h-40 bg-gray-200 rounded" />
           </div>
         </div>
-      </div>
+      </main>
     );
   }
 
   if (!product) {
     return (
-      <div className="text-center py-20">
-        Product not found
-      </div>
+      <main className="text-center py-20" role="alert">
+        <h1 className="text-lg font-semibold">Product not found</h1>
+      </main>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-2 xs:px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-10">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 lg:gap-12">
+    <main
+      className="max-w-7xl mx-auto px-4 py-10"
+      aria-label={`Product details for ${product.name}`}
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
-        {/* =======================================
-            PRODUCT IMAGES
-        ======================================== */}
-
-        <div>
+        {/* ================= PRODUCT IMAGES ================= */}
+        <section aria-label="Product images">
           <Swiper
             modules={[Navigation, Thumbs]}
             navigation
             thumbs={{
-              swiper:
-                thumbsSwiper && !thumbsSwiper.destroyed
-                  ? thumbsSwiper
-                  : null,
+              swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
             }}
             className="border rounded-2xl overflow-hidden bg-white"
           >
             {images.map((image) => (
               <SwiperSlide key={image.id}>
-                <div className="group overflow-hidden bg-white">
-                  <img
-                    src={`${baseUrl}${image.imgUrl}`}
-                    alt={product.name}
-                    className="
-                      w-full
-                      h-64 sm:h-80 md:h-96 lg:h-[500px]
-                      object-cover
-                      transition-transform
-                      duration-300
-                      group-hover:scale-110
-                      cursor-zoom-in
-                    "
-                  />
-                </div>
+                <img
+                  src={`${baseUrl}${image.imgUrl}`}
+                  alt={`${product.name} product image`}
+                  className="w-full h-[400px] object-cover"
+                />
               </SwiperSlide>
             ))}
           </Swiper>
-
-          {/* Thumbnails */}
 
           {images.length > 1 && (
             <Swiper
               onSwiper={setThumbsSwiper}
               spaceBetween={8}
-              breakpoints={{
-                0: {
-                    slidesPerView: 3,
-                },
-                480: {
-                    slidesPerView: 4,
-                },
-                768: {
-                    slidesPerView: 5,
-                },
-                1024: {
-                    slidesPerView: 5,
-                },
-            }}
               watchSlidesProgress
-              className="mt-3 sm:mt-4"
+              className="mt-4"
+              aria-label="Product thumbnails"
             >
               {images.map((image) => (
                 <SwiperSlide key={image.id}>
-                  <img
-                    src={`${baseUrl}${image.imgUrl}`}
-                    alt=""
-                    className="
-                      h-16 sm:h-20 md:h-24
-                      w-full
-                      object-cover
-                      rounded-lg
-                      border
-                      cursor-pointer
-                      transition-opacity
-                      hover:opacity-70
-                    "
-                  />
+                  <button
+                    type="button"
+                    className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
+                    aria-label="View product image"
+                  >
+                    <img
+                      src={`${baseUrl}${image.imgUrl}`}
+                      alt=""
+                      aria-hidden="true"
+                      className="h-20 w-full object-cover rounded-lg border"
+                    />
+                  </button>
                 </SwiperSlide>
               ))}
             </Swiper>
           )}
-        </div>
+        </section>
 
-        {/* =======================================
-            PRODUCT INFO
-        ======================================== */}
-
-        <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
+        {/* ================= PRODUCT INFO ================= */}
+        <section aria-label="Product information">
+          <h1 className="text-3xl font-bold text-gray-900">
             {product.name}
           </h1>
 
-          <div className="mt-2 sm:mt-4">
-            <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-600">
-              {currencyFormatter.format(product.price)}
-            </span>
-          </div>
+          <p className="mt-2 text-3xl font-bold text-blue-600">
+            {currencyFormatter.format(product.price)}
+          </p>
 
-          <div className="mt-4 sm:mt-6 md:mt-8">
-            <h2 className="font-semibold text-base sm:text-lg mb-2">
-              Description
-            </h2>
-
-            <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+          <section className="mt-6" aria-label="Product description">
+            <h2 className="font-semibold text-lg">Description</h2>
+            <p className="text-gray-600 mt-2 leading-relaxed">
               {product.description}
             </p>
-          </div>
+          </section>
 
-          {/* Specifications */}
-
-          {product.attributes?.length > 0 && (
-            <div className="mt-6 sm:mt-8 md:mt-10">
-              <h2 className="font-semibold text-base sm:text-lg mb-3 sm:mb-4">
-                Specifications
-              </h2>
-
-              <div className="rounded-xl border overflow-hidden">
-                {product.attributes.map((attribute) => (
-                  <div
-                    key={attribute.id}
-                    className="
-                      flex
-                      flex-col
-                      sm:flex-row
-                      sm:justify-between
-                      px-3 sm:px-4
-                      py-2 sm:py-3
-                      border-b
-                      last:border-b-0
-                      text-sm sm:text-base
-                    "
-                  >
-                    <span className="font-medium text-gray-700">
-                      {attribute.attributeName}
-                    </span>
-
-                    <span className="text-gray-600 break-words">
-                      {attribute.attributeValue}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Quantity */}
-
-          <div className="mt-6 sm:mt-8 md:mt-10">
-            <label className="font-semibold text-sm sm:text-base block mb-2 sm:mb-3">
+          {/* ================= QUANTITY ================= */}
+          <section className="mt-8" aria-label="Quantity selector">
+            <h2 className="font-semibold mb-2">
               Quantity
-            </label>
+              <span className="sr-only">
+                Current quantity is {quantity}
+              </span>
+            </h2>
 
-            <div className="flex items-center w-full sm:w-fit border rounded-xl overflow-hidden">
+            <div className="flex items-center border rounded-xl w-fit">
               <button
                 onClick={decrementQty}
-                className="px-3 sm:px-4 py-2 sm:py-3 hover:bg-gray-100"
+                disabled={quantity === 1}
+                aria-label="Decrease quantity"
+                className="px-4 py-3 hover:bg-gray-100 disabled:opacity-40"
               >
-                <Minus size={16} className="sm:w-5 sm:h-5" />
+                <Minus size={18} />
               </button>
 
-              <div className="flex-1 sm:flex-none text-center px-4 sm:px-6 font-semibold text-sm sm:text-base">
+              <span
+                className="px-6 font-semibold"
+                aria-live="polite"
+              >
                 {quantity}
-              </div>
+              </span>
 
               <button
                 onClick={incrementQty}
-                className="px-3 sm:px-4 py-2 sm:py-3 hover:bg-gray-100"
+                aria-label="Increase quantity"
+                className="px-4 py-3 hover:bg-gray-100"
               >
-                <Plus size={16} className="sm:w-5 sm:h-5" />
+                <Plus size={18} />
               </button>
             </div>
-          </div>
+          </section>
 
-          {/* Actions */}
-
-          <div className="mt-6 sm:mt-8 md:mt-10 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+          {/* ================= ACTIONS ================= */}
+          <section className="mt-8" aria-label="Purchase actions">
             <button
-                onClick={handleAddToCart}
-                disabled={cartLoading}
-                className="
-                    flex-1
-                    bg-blue-600
-                    text-white
-                    text-sm sm:text-base
-                    py-3 sm:py-4
-                    rounded-xl
-                    hover:bg-blue-700
-                    active:bg-blue-800
-                    transition
-                    font-semibold
-                    disabled:opacity-50
-                    disabled:cursor-not-allowed
-                "
-                >
-                {cartLoading ? "Adding..." : "Add To Cart"}
+              onClick={handleAddToCart}
+              disabled={cartLoading}
+              aria-busy={cartLoading}
+              className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+            >
+              {cartLoading ? "Adding to cart..." : "Add to Cart"}
             </button>
 
             <button
-              className="
-                flex-1
-                border
-                border-gray-300
-                text-sm sm:text-base
-                py-3 sm:py-4
-                rounded-xl
-                hover:bg-gray-50
-                active:bg-gray-100
-                transition
-                font-semibold
-              "
+              className="w-full mt-3 border py-4 rounded-xl font-semibold hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+              aria-label="Buy this product now"
             >
               Buy Now
             </button>
-          </div>
+          </section>
 
-          {/* Trust badges */}
-
-          <div className="mt-6 sm:mt-8 text-xs sm:text-sm text-gray-500 space-y-1 sm:space-y-2">
+          {/* ================= TRUST ================= */}
+          <section className="mt-8 text-sm text-gray-500" aria-label="Trust indicators">
             <p>✓ Secure Checkout</p>
             <p>✓ Fast Delivery</p>
             <p>✓ Quality Guarantee</p>
-          </div>
-        </div>
+          </section>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

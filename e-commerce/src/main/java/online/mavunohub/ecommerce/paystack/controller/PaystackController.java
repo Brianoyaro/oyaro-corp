@@ -30,14 +30,19 @@ public class PaystackController {
             @RequestBody PaystackRequestDto paystackRequestDto
     ) {
         try {
-//            String shippingAddress = paystackRequestDto.getShippingCounty() + paystackRequestDto.getShippingTown() + paystackRequestDto.getShippingStreet();
             String shippingAddress =
                     String.join(", ",
                             paystackRequestDto.getShippingStreet(),
                             paystackRequestDto.getShippingTown(),
                             paystackRequestDto.getShippingCounty());
-            PaystackResponseDto response = paystackService.initializePaystack(user, shippingAddress);
+            String phone = paystackRequestDto.getContactPhone();
+            PaystackResponseDto response = paystackService.initializePaystack(user, shippingAddress, phone);
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (RuntimeException e) {
+            log.error(e.getMessage());
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
         } catch (Exception e) {
             log.error(e.getMessage());
             Map<String, Object> error = new HashMap<>();
@@ -54,6 +59,11 @@ public class PaystackController {
                     .build();
             VerifyResponseDto response = paystackService.verifyPaystack(verifyRequestDto, user);
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (RuntimeException e) {
+            log.error(e.getMessage());
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
         } catch (Exception e) {
             log.error(e.getMessage());
             Map<String, Object> error = new HashMap<>();

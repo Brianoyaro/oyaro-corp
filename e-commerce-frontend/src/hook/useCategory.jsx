@@ -22,8 +22,8 @@ export function useCreateCategory() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: categoriesAPI.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['categories'] });
     },
   });
 }
@@ -32,9 +32,22 @@ export function useUpdateCategory() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: categoriesAPI.update,
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
-      queryClient.invalidateQueries({ queryKey: ['category', variables.id] });
+    onSuccess: async (_, variables) => {
+      await queryClient.invalidateQueries({ queryKey: ['categories'] });
+      await queryClient.invalidateQueries({ queryKey: ['category', variables.id] });
+    },
+  });
+}
+
+export function useDeleteCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: categoriesAPI.delete,
+    onSuccess: async (_, id) => {
+      await queryClient.invalidateQueries({queryKey: ["categories"],});
+      await queryClient.removeQueries({ queryKey: ["category", id],});
+      await queryClient.invalidateQueries({ queryKey: ["products"],});
     },
   });
 }

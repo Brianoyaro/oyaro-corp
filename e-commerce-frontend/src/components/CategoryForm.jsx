@@ -67,10 +67,6 @@ export default function CategoryForm({
     categoryData = data;
     isLoading = loading;
   }
-  // console.log("Category Data:", categoryData);
-  // console.log("Is Loading:", isLoading);
-  // console.log("Mode:", mode);
-  // console.log("Category ID:", categoryId);
 
 
   useEffect(() => {
@@ -108,7 +104,6 @@ export default function CategoryForm({
       attributes: data.attributes,
     };
 
-    console.log(payload);
 
     try {
       if (mode === "create") {
@@ -118,7 +113,6 @@ export default function CategoryForm({
             //   "Category created successfully"
             // );
             toast.success("Category created successfully")
-            reset();
           },
         });
       } else {
@@ -139,7 +133,6 @@ export default function CategoryForm({
       }
       navigate("/admin-home")
     } catch (error) {
-      console.error(error);
       toast.error('Failed to create category')
       // alert('Failed to create category');
     }

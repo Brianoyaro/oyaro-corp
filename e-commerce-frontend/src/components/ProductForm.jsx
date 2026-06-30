@@ -72,7 +72,6 @@ export default function ProductForm({mode = "create", productId = null}) {
     const { data: productData, isLoading: productLoading } = useProduct(productId);
     product = productData;
     isLoading = productLoading;
-    console.log("Fetched product for edit:", product);
   }
   
   
@@ -148,7 +147,6 @@ export default function ProductForm({mode = "create", productId = null}) {
 
 
   const buildFormData = (data) => {
-    console.log("Building FormData with data:", data);
     const formData = new FormData();
     const productPayload = {
       name: data.name,
@@ -178,20 +176,17 @@ export default function ProductForm({mode = "create", productId = null}) {
         toast.success("Product created successfully")
         // alert("Product created successfully");
       } catch (err) {
-        console.error(err);
         toast.error("Failed to create product")
         // alert("Failed to create product");
       }
     } else if (mode === "edit") {
       let toKeep = existingImages.map((img) => (img.imgUrl ));
-      console.log("Existing images to keep:", toKeep);
       formData.append("imagesToKeep", new Blob([JSON.stringify(toKeep)], { type: "application/json" }));
       try {
         updateProduct({ id: productId, formData });
         toast.success("Product updated successfully")
         // alert("Product updated successfully");
       } catch (err) {
-        console.error(err);
         toast.error("Failed to update product")
         // alert("Failed to update product");
       }

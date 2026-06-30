@@ -51,13 +51,10 @@ export function CartProvider({children}) {
                                 "productId": item.productId,
                                 "quantity": item.quantity
                         });
-                            console.log(`Successfully uploaded ${item.productName} to the backend`)
                         } catch (error) {
-                            console.error(`Failed to migrate item: ${item.productName}`)
                         }
                     }
                     localStorage.removeItem(STORAGE_KEY)
-                    console.log('cart migration complete :)')
                 }
 
                 // load from backend cart
@@ -74,14 +71,12 @@ export function CartProvider({children}) {
                         : []
                     );
                 } catch (err) {
-                    console.error("Invalid cart data", err);
                     localStorage.removeItem(STORAGE_KEY);
                     setCart([]);
                 }
             }
         } catch (error) {
             //
-            console.error(`Failed to intize cart. Error: ${error}`)
         } finally {
             setHasInitialized(true)
             setLoading(false)
@@ -94,7 +89,6 @@ export function CartProvider({children}) {
     async(item) => {
         try {
             setLoading(true)
-            console.log(`Adding ${item.name} to cart`)
             
             if (isAuthenticated) {
                 await cartApi.addToCart
@@ -102,7 +96,6 @@ export function CartProvider({children}) {
                     "productId": item.productId ?? item.id,
                     "quantity": item.quantity ?? 1
                 });
-                console.log(`Successfully uploaded ${item.productName} to the backend`)
                 // refetch update
                 const response = await cartApi.getCart()
                 const transformedResponse = (response|| []).map(transformBackEndCart);
@@ -139,9 +132,7 @@ export function CartProvider({children}) {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCart))
             }
 
-            console.log("Finished adding item to cart")
         } catch (error) {
-            console.error("Error adding product to cart");
             throw error;
         } finally {
             setLoading(false)
@@ -170,9 +161,7 @@ export function CartProvider({children}) {
                 setCart(updatedCart);
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCart))
             }
-            console.log("Successfully removed product from cart")
         } catch (error) {
-            console.error("Error removing item from cart")
             throw error;
         } finally {
             setLoading(false)
@@ -190,15 +179,13 @@ export function CartProvider({children}) {
                     try {
                         await cartApi.removeFromCart(item.productId);
                     } catch (err) {
-                        console.warn(`⚠️ Failed to remove item ${item.id} from backend:`, err);
+                        //
                     }
                 }
             }
             setCart([]);
             localStorage.removeItem(STORAGE_KEY);
-            console.log("Successfully cleared the cart")
         } catch (error) {
-            console.error("Error encountered during cart clearing operation")
             throw error;
         } finally {
             setLoading(false)
@@ -231,7 +218,6 @@ export function CartProvider({children}) {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCart))
             }
         } catch (error) {
-            console.error("Error enctoured during product update")
             throw error;
         } finally {
             setLoading(false)

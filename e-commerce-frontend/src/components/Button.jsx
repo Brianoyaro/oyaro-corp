@@ -5,9 +5,10 @@ export function Button({
   className = '',
   disabled = false,
   onClick,
+  type = 'button',
   ...props 
 }) {
-  const baseStyles = 'font-semibold rounded-lg transition-colors duration-200 inline-block';
+  const baseStyles = 'font-semibold rounded-lg transition-colors duration-200 inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600';
   
   const variants = {
     primary: 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400',
@@ -30,6 +31,7 @@ export function Button({
       className={`${baseStyles} ${variantStyles} ${sizeStyles} ${className}`}
       disabled={disabled}
       onClick={onClick}
+      type={type}
       {...props}
     >
       {children}

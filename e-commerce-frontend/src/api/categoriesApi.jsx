@@ -28,7 +28,6 @@ export const categoriesAPI = {
     
     create: async (categoryData) => {
         try {
-            console.log("Creating category with data:", categoryData);
             const response = await apiClient.post('/categories/create', categoryData);
             return response.data;
         } catch (error) {
@@ -36,6 +35,18 @@ export const categoriesAPI = {
             error.response?.data?.message ||
             error.message ||
             `Failed to create category`;
+            throw new Error(errorMessage);
+        }},
+
+    delete: async (categoryId) => {
+        try {
+            const response = await apiClient.delete(`/categories/${categoryId}`);
+            return response.data;
+        } catch (error) {
+            const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            `Failed to delete category`;
             throw new Error(errorMessage);
         }},
     

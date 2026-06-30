@@ -16,9 +16,7 @@ export function Navbar() {
   const location = useLocation();
   const { isAuthenticated, logout } = useAuth();
   const { data: user } = useProfile();
-  // const isAdmin = user?.role?.toLowerCase().includes(('ADMIN').toLowerCase);
   const isAdmin = user?.role === 'ADMIN';
-  console.log(isAdmin)
 
   const navItems = [
     { id: 'home', label: 'Home', path: '/' },
@@ -141,32 +139,8 @@ export function Navbar() {
                             >
                             Admin Dashboard
                             </Link>
-
-                            <Link
-                            to="/admin/products"
-                            onClick={() => setIsAuthMenuOpen(false)}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                            Manage Products
-                            </Link>
-
-                            <Link
-                            to="/admin/categories"
-                            onClick={() => setIsAuthMenuOpen(false)}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                            Manage Categories
-                            </Link>
                         </>
                         )}
-                      <Link
-                        to="/profile"
-                        onClick={() => setIsAuthMenuOpen(false)}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                      >
-                        <FaUser className="inline w-4 h-4 mr-2" />
-                        My Profile
-                      </Link>
                       { !isAdmin && (
                         <Link
                         to="/orders"
@@ -251,32 +225,8 @@ export function Navbar() {
                         >
                         Admin Dashboard
                         </Link>
-
-                        <Link
-                        to="/admin/products"
-                        onClick={handleLinkClick}
-                        className="block px-4 py-2.5 text-gray-600 hover:bg-gray-100 rounded-lg"
-                        >
-                        Manage Products
-                        </Link>
-
-                        <Link
-                        to="/admin/categories"
-                        onClick={handleLinkClick}
-                        className="block px-4 py-2.5 text-gray-600 hover:bg-gray-100 rounded-lg"
-                        >
-                        Manage Categories
-                        </Link>
                     </>
                     )}
-                  <Link
-                    to="/profile"
-                    onClick={handleLinkClick}
-                    className="block px-4 py-2.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <FaUser className="inline w-4 h-4 mr-2" />
-                    My Profile
-                  </Link>
                   {!isAdmin &&(
                     <Link
                     to="/orders"
