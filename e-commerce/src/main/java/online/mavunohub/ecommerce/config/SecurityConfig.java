@@ -125,7 +125,9 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5174",
                 "http://localhost:5173",
-		"https://oyaro-corp-frontend.onrender.com"
+		"https://oyaro-corp-frontend.onrender.com",
+		"https://mavunohub.online",
+		"https://www.mavunohub.online"
         ));
 
         // Allow specific HTTP methods
