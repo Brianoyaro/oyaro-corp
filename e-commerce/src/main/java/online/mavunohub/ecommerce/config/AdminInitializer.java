@@ -36,10 +36,10 @@ public class AdminInitializer {
                         .email(adminEmail)
                         .password(passwordEncoder.encode(adminPassword))
                         .role(Role.ADMIN)
-                        .cart(cart)
                         .lastLogin(LocalDateTime.now())
                         .build();
-
+                admin.setCart(cart);
+                cart.setUser(admin);
                 userRepo.save(admin);
 
                 log.info("✅ Admin user created at startup");
