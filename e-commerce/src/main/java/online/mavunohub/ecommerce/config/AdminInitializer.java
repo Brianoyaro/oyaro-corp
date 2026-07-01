@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import online.mavunohub.ecommerce.Authentication.model.Role;
 import online.mavunohub.ecommerce.Authentication.model.User;
 import online.mavunohub.ecommerce.Authentication.repository.UserRepo;
+import online.mavunohub.ecommerce.Cart.model.Cart;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,10 +31,12 @@ public class AdminInitializer {
             boolean adminExists = userRepo.existsByEmail(adminEmail) && userRepo.existsByRole(Role.ADMIN);
 
             if (!adminExists) {
+                Cart cart = new Cart();
                 User admin = User.builder()
                         .email(adminEmail)
                         .password(passwordEncoder.encode(adminPassword))
                         .role(Role.ADMIN)
+                        .cart(cart)
                         .lastLogin(LocalDateTime.now())
                         .build();
 
