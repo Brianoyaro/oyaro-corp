@@ -33,6 +33,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         log.debug("Attempting to authenticate user");
 
+        if (request.getRequestURI().startsWith("/uploads/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Extract the token
         final String authHeader = request.getHeader("Authorization");
 
